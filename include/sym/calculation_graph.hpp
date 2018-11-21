@@ -49,7 +49,8 @@ class CalculationGraph {
             }
 
             depth += 1;
-            for (auto &&dkey : depends_list[key]) {
+            for (auto &&dkey_ : depends_list[key]) {
+                int dkey = id_mapping[dkey_];
                 if (depths[dkey] <= depth) {
                     continue;
                 }
@@ -69,9 +70,9 @@ class CalculationGraph {
         std::sort(test_order.begin(), test_order.end());
         for (auto &&[depth, key] : test_order) {
             if (output_nodes.find(key) == output_nodes.end()) {
-                output_order.emplace_back(tvar + std::to_string(key), key);
+                output_order.emplace_back(tvar_type, tvar + std::to_string(key), key);
             } else {
-                output_order.emplace_back(output_nodes[key], key);
+                output_order.emplace_back("", output_nodes[key], key);
             }
         }
         std::reverse(output_order.begin(), output_order.end());
@@ -79,18 +80,19 @@ class CalculationGraph {
 
     friend std::ostream &operator<<(std::ostream &os, const CalculationGraph &g) {
         std::vector<Repr> cur_repr_list = g.repr_list;
-        for (auto &&[dvar, key] : g.output_order) {
-            os << g.line_prefix << dvar << " = " << cur_repr_list[key](cur_repr_list) << ";" << std::endl;
+        for (auto &&[dtype, dvar, key] : g.output_order) {
+            std::string dv = dtype == "" ? dvar : dtype + " " + dvar;
+            os << g.line_prefix << dv << " = " << cur_repr_list[key](cur_repr_list) << ";" << std::endl;
             cur_repr_list[key] = _repr(dvar);
         }
         return os;
     }
 
  protected:
-    std::string tvar{"double _tmp"}, line_prefix{""};
+    std::string tvar_type{"double"}, tvar{"_tmp"}, line_prefix{""};
     std::unordered_map<int, std::string> input_nodes, output_nodes;
     std::vector<Repr> repr_list;
-    std::vector<std::tuple<std::string, int>> output_order;
+    std::vector<std::tuple<std::string, std::string, int>> output_order;
 };
 
 }  // namespace sym

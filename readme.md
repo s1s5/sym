@@ -38,5 +38,5 @@
     ns::cls f(x0, y);
     f(x1);
     std::cout << y[0] << ", " << y[1] << std::endl;
-    f.refresh();  // use pointer set in constructor
+    f.refresh();  // recalculate with pointer that is set in constructor
     f(x1_new);
