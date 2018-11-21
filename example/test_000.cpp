@@ -43,6 +43,7 @@ int main(int argc, char **argv) {
     std::cout << "z = " << z << std::endl;
     std::cout << "dz/dx = " << dz << " : " << "is_one=" << is_one(dz) << ", is_constant=" << is_constant(dz) << std::endl;
 
+    sym::Repr r = sym::_repr("(", 3, "+", 4, ")");
     
     return 0;
 }

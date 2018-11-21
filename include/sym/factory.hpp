@@ -24,7 +24,7 @@ class Factory : public FactoryBase {
  public:
     class Digraph {
      public:
-        Digraph(const std::vector<std::string> &rev_repr_map_, const std::vector<std::unordered_set<int>> &depends_list_,
+        Digraph(const std::vector<Repr> &rev_repr_map_, const std::vector<std::unordered_set<int>> &depends_list_,
                 const std::vector<int> &aliases_) : rev_repr_map(rev_repr_map_), depends_list(depends_list_), aliases(aliases_.size()) {
             for (size_t i = 0; i < aliases_.size(); i++) {
                 int id = i;
@@ -36,9 +36,12 @@ class Factory : public FactoryBase {
         }
 
         friend std::ostream &operator<<(std::ostream &os, const Digraph &d) {
+            std::vector<Repr> cur_rev_repr_map = d.rev_repr_map;
             os << "digraph graphname {" << std::endl;
             for (size_t i = 0; i < d.rev_repr_map.size(); i++) {
-                os << "    n" << i << " [label=\"" << d.rev_repr_map[i] << "\"];" << std::endl;
+                std::string result = cur_rev_repr_map[i](cur_rev_repr_map);
+                os << "    n" << i << " [label=\"" << i << "=" << result << "\"];" << std::endl;
+                cur_rev_repr_map[i] = _repr(std::to_string(i));
             }
             for (size_t i = 0; i < d.depends_list.size(); i++) {
                 for (auto &&j : d.depends_list[i]) {
@@ -49,7 +52,7 @@ class Factory : public FactoryBase {
         }
         
      protected:
-        std::vector<std::string> rev_repr_map;
+        std::vector<Repr> rev_repr_map;
         std::vector<std::unordered_set<int>> depends_list;
         std::vector<int> aliases;
     };

@@ -14,7 +14,7 @@ namespace sym {
 
 class NegFunction : public Function {
  public:
-    NegFunction(const Function::shared &arg_) : Function("(-" + arg_->repr() + ")", FactoryBase::depends(arg_->id())), arg(arg_) {}
+    NegFunction(const Function::shared &arg_) : Function(_repr("(-", arg_->id(), ")"), FactoryBase::depends(arg_->id())), arg(arg_) {}
 
     virtual shared diff(shared v) const override {
         return std::make_shared<NegFunction>(arg->diff(v));

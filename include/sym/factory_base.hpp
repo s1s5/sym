@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <string>
+#include <sstream>
 #include <memory>
 #include <unordered_set>
 #include <unordered_map>
@@ -18,12 +19,43 @@ namespace sym {
 
 class Function;
 
+struct Repr {
+    struct Item {
+        Item(const char *v) : is_id(false), s(v), id(-1) {}
+        Item(const std::string &v) : is_id(false), s(v), id(-1) {}
+        Item(const int &v) : is_id(true), s(""), id(v) {}
+
+        bool is_id;
+        std::string s;
+        int id;
+    };
+    std::string operator()(const std::vector<Repr> &id2repr) const {
+        std::stringstream ss;
+        for (auto &&item : items) {
+            if (item.is_id) {
+                ss << id2repr[item.id](id2repr);
+            } else {
+                ss << item.s;
+            }
+        }
+        return ss.str();
+    }
+    std::vector<Item> items;
+};
+
+template<class ...T>
+Repr _repr(const T&... args) {
+    Repr r;
+    r.items = {args...};
+    return r;
+}
+
 class FactoryBase {
  public:
     static FactoryBase *get() {
         return get_set(nullptr);
     }
-    static int add(const std::string &repr, const std::unordered_set<int> &depends, Function * f) {
+    static int add(const Repr &repr, const std::unordered_set<int> &depends, Function * f) {
         return get()->_add(repr, depends, f);
     }
     
@@ -42,11 +74,12 @@ class FactoryBase {
         return result;
     }
     static const std::unordered_set<int> &wholeDepends(int id) { return get()->_wholeDepends(id); }
-    static const std::string &repr(int id) {
-        while (get()->aliases[id] >= 0) {
-            id = get()->aliases[id];
-        }
-        return get()->rev_repr_map[id];
+    static std::string repr(int id) {
+        return get()->rev_repr_map[id](get()->rev_repr_map);
+        // while (get()->aliases[id] >= 0) {
+        //     id = get()->aliases[id];
+        // }
+        // return get()->rev_repr_map[id];
     }
 
     static void setAliasRepr(int id0, int id1) {
@@ -78,12 +111,13 @@ class FactoryBase {
         get_set(this);
     }
 
-    int _add(const std::string &repr, const std::unordered_set<int> &depends, Function *f ) {
+    int _add(const Repr &repr_obj, const std::unordered_set<int> &depends, Function *f ) {
+        std::string repr = repr_obj(rev_repr_map);
         auto iter = repr_map.find(repr);
         if (iter == repr_map.end()) {
             int index = repr_map.size();
             repr_map[repr] = index;
-            rev_repr_map.push_back(repr);
+            rev_repr_map.push_back(repr_obj);
             depends_list.push_back(depends);
             whole_depends_list.push_back(depends);
             for (auto &&d: depends) {
@@ -104,7 +138,7 @@ class FactoryBase {
  protected:
     int num_input_variables;
     std::unordered_map<std::string, int> repr_map;
-    std::vector<std::string> rev_repr_map;
+    std::vector<Repr> rev_repr_map;
     std::vector<std::unordered_set<int>> depends_list, whole_depends_list;
     std::vector<int> aliases;
     std::vector<Function*> functions;

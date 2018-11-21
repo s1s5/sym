@@ -16,7 +16,7 @@ namespace sym {
 class BinaryFunction : public Function {
  public:
     BinaryFunction(const std::string &operator_, const Function::shared &arg0_, const Function::shared &arg1_) :
-        Function("(" + arg0_->repr() + operator_ + arg1_->repr() + ")", FactoryBase::depends(arg0_->id(), arg1_->id())),
+        Function(_repr("(", arg0_->id(), operator_, arg1_->id(), ")"), FactoryBase::depends(arg0_->id(), arg1_->id())),
         arg0(arg0_), arg1(arg1_) {}
  protected:
     Function::shared arg0, arg1;

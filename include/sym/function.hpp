@@ -29,7 +29,7 @@ class Function : public std::enable_shared_from_this<Function> {
     bool is() const { return dynamic_cast<const T*>(this); }
 
  protected:
-    Function(const std::string &repr, const std::unordered_set<int> &depends) : _id(FactoryBase::add(repr, depends, this)) {
+    Function(const Repr &repr, const std::unordered_set<int> &depends) : _id(FactoryBase::add(repr, depends, this)) {
     }
     
  private:
@@ -38,7 +38,7 @@ class Function : public std::enable_shared_from_this<Function> {
 
 class Constant : public Function {
  public:
-    Constant(double value_) : Function(std::to_string(value_), {}), _value(value_) {}
+    Constant(double value_) : Function(_repr(std::to_string(value_)), {}), _value(value_) {}
     virtual shared diff(shared v) const override { return std::make_shared<Constant>(0); }
     virtual void simplified() const override {}
     virtual double eval() const override { return _value; }
@@ -63,7 +63,7 @@ inline bool is_constant(const Function::shared &f) {
 
 class Variable : public Function {
  public:
-    Variable(const std::string &symbol) : Function(symbol, {}) {}
+    Variable(const std::string &symbol) : Function(_repr(symbol), {}) {}
     virtual shared diff(shared v) const override {
         if (v->id() == id()) {
             return std::make_shared<Constant>(1);
