@@ -10,7 +10,10 @@
 
 #include "factory_base.hpp"
 #include "function.hpp"
+#include "unary_function.hpp"
 #include "binary_function.hpp"
+#include "calculation_graph.hpp"
+#include "cxx_code_printer.hpp"
 #include "factory.hpp"
 #include "io.hpp"
 
