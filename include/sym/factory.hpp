@@ -116,6 +116,25 @@ class Factory : public FactoryBase {
         return CalculationGraph(input_nodes, output_nodes, rev_repr_map, depends_list, idMapping());
     }
 
+    void simplified() {
+        for (auto &&[symbol, ptr_vlist] : static_outputs) {
+            for (size_t index = 0; index < ptr_vlist->size(); index++) {
+                if (not ptr_vlist->at(index)) {
+                    throw std::runtime_error("output variable is not set");
+                }
+                ptr_vlist->at(index)->simplified();
+            }
+        }
+        for (auto &&[symbol, ptr_vlist] : dynamic_outputs) {
+            for (size_t index = 0; index < ptr_vlist->size(); index++) {
+                if (not ptr_vlist->at(index)) {
+                    throw std::runtime_error("output variable is not set");
+                }
+                ptr_vlist->at(index)->simplified();
+            }
+        }
+    }
+
     CxxCodePrinter cxxCodePrinter(const std::string &ns, const std::string &class_name) {
         CxxCodePrinter printer(ns, class_name);
         std::vector<std::string> static_variables, dynamic_variables;
