@@ -23,16 +23,22 @@ class FactoryBase {
     static FactoryBase *get() {
         return get_set(nullptr);
     }
-    static int add(const std::string &repr, const std::unordered_set<int> &depends) {
-        return get()->_add(repr, depends);
+    static int add(const std::string &repr, const std::unordered_set<int> &depends, Function * f) {
+        return get()->_add(repr, depends, f);
     }
-
-    static const std::unordered_set<int> &depends(int id) { return get()->_depends(id); }
+    
+    static std::unordered_set<int> depends(int id) {
+        std::unordered_set<int> result = get()->_depends(id);
+        result.insert(id);
+        return result;
+    }
     static std::unordered_set<int> depends(int id0, int id1) {
         std::unordered_set<int> result = get()->_depends(id0);
         for (auto &&i : get()->_depends(id1)) {
             result.insert(i);
         }
+        result.insert(id0);
+        result.insert(id1);
         return result;
     }
     static const std::unordered_set<int> &wholeDepends(int id) { return get()->_wholeDepends(id); }
@@ -45,6 +51,14 @@ class FactoryBase {
 
     static void setAliasRepr(int id0, int id1) {
         get()->aliases[id0] = id1;
+    }
+
+    template<class T>
+    static bool is(int id) {
+        while (get()->aliases[id] >= 0) {
+            id = get()->aliases[id];
+        }
+        return dynamic_cast<T*>(get()->functions[id]);
     }
 
  protected:
@@ -64,7 +78,7 @@ class FactoryBase {
         get_set(this);
     }
 
-    int _add(const std::string &repr, const std::unordered_set<int> &depends) {
+    int _add(const std::string &repr, const std::unordered_set<int> &depends, Function *f ) {
         auto iter = repr_map.find(repr);
         if (iter == repr_map.end()) {
             int index = repr_map.size();
@@ -78,6 +92,7 @@ class FactoryBase {
                 }
             }
             aliases.push_back(-1);
+            functions.push_back(f);
             return index;
         }
         return iter->second;
@@ -92,6 +107,7 @@ class FactoryBase {
     std::vector<std::string> rev_repr_map;
     std::vector<std::unordered_set<int>> depends_list, whole_depends_list;
     std::vector<int> aliases;
+    std::vector<Function*> functions;
 };
 }  // namespace sym
 

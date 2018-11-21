@@ -19,7 +19,7 @@ class Function : public std::enable_shared_from_this<Function> {
  public:
     virtual ~Function() {}
     int id() const { return _id; }
-    const std::string &repr() { return FactoryBase::repr(_id); }
+    std::string repr() { return FactoryBase::repr(_id); }
 
     virtual shared diff(shared v) const = 0;
     virtual void simplified() const = 0;
@@ -29,7 +29,7 @@ class Function : public std::enable_shared_from_this<Function> {
     bool is() const { return dynamic_cast<const T*>(this); }
 
  protected:
-    Function(const std::string &repr, const std::unordered_set<int> &depends) : _id(FactoryBase::add(repr, depends)) {
+    Function(const std::string &repr, const std::unordered_set<int> &depends) : _id(FactoryBase::add(repr, depends, this)) {
     }
     
  private:
@@ -55,6 +55,10 @@ inline bool is_zero(const Function::shared &f) {
 inline bool is_one(const Function::shared &f) {
     static const std::string one_string = std::to_string(1.0);
     return f->repr() == one_string;
+}
+
+inline bool is_constant(const Function::shared &f) {
+    return FactoryBase::is<Constant>(f->id());
 }
 
 class Variable : public Function {
