@@ -12,6 +12,7 @@
 
 #include "factory_base.hpp"
 #include "function.hpp"
+#include "calculation_graph.hpp"
 
 namespace sym {
 
@@ -82,6 +83,37 @@ class Factory : public FactoryBase {
     virtual ~Factory() {}
     Function::shared diff(const Function::shared &func, const Function::shared &var) { return func->diff(var); }
     Digraph digraph() const { return Digraph(rev_repr_map, depends_list, idMapping()); }
+    CalculationGraph wholeGraph() const {
+        std::unordered_map<int, std::string> input_nodes;
+        std::unordered_map<int, std::string> output_nodes;
+        for (auto &&[symbol, vlist] : static_inputs) {
+            for (auto &&v : vlist) {
+                input_nodes[v->id()] = rev_repr_map[v->id()](rev_repr_map);
+            }
+        }
+        for (auto &&[symbol, vlist] : dynamic_inputs) {
+            for (auto &&v : vlist) {
+                input_nodes[v->id()] = rev_repr_map[v->id()](rev_repr_map);
+            }
+        }
+        for (auto &&[symbol, ptr_vlist] : static_outputs) {
+            for (size_t index = 0; index < ptr_vlist->size(); index++) {
+                if (not ptr_vlist->at(index)) {
+                    throw std::runtime_error("output variable is not set");
+                }
+                output_nodes[ptr_vlist->at(index)->id()] = symbol + "[" + std::to_string(index) + "]";
+            }
+        }
+        for (auto &&[symbol, ptr_vlist] : dynamic_outputs) {
+            for (size_t index = 0; index < ptr_vlist->size(); index++) {
+                if (not ptr_vlist->at(index)) {
+                    throw std::runtime_error("output variable is not set");
+                }
+                output_nodes[ptr_vlist->at(index)->id()] = symbol + "[" + std::to_string(index) + "]";
+            }
+        }
+        return CalculationGraph(input_nodes, output_nodes, rev_repr_map, depends_list, idMapping());
+    }
 
  protected:
     

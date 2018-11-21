@@ -17,7 +17,7 @@ class MyFactory : public Factory {
     StaticOutput y{"y", 2};
     
     void generate() {
-        y[0] = x[0] + x[1];
+        y[0] = x[0] + x[1] * x[1];
         y[1] = x[0] * x[1];
 
         std::cout << y[0] << ", " << y[1] << std::endl;
@@ -31,6 +31,7 @@ int main(int argc, char **argv) {
     MyFactory f;
     f.generate();
     std::cout << f.digraph() << std::endl;
+    std::cout << f.wholeGraph() << std::endl;
 
     auto x = std::make_shared<sym::Variable>("x");
     auto y = std::make_shared<sym::Variable>("y");
