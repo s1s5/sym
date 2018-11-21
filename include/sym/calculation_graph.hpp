@@ -89,7 +89,7 @@ class CalculationGraph {
     }
 
  protected:
-    std::string tvar_type{"double"}, tvar{"_tmp"}, line_prefix{""};
+    std::string tvar_type{"IntermediateScalar"}, tvar{"_t"}, line_prefix{""};
     std::unordered_map<int, std::string> input_nodes, output_nodes;
     std::vector<Repr> repr_list;
     std::vector<std::tuple<std::string, std::string, int>> output_order;

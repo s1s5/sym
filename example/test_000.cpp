@@ -32,6 +32,7 @@ int main(int argc, char **argv) {
     f.generate();
     std::cout << f.digraph() << std::endl;
     std::cout << f.wholeGraph() << std::endl;
+    std::cout << f.cxxCodePrinter("namespace_name", "ClassName") << std::endl;
 
     auto x = std::make_shared<sym::Variable>("x");
     auto y = std::make_shared<sym::Variable>("y");

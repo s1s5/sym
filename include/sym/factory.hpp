@@ -13,6 +13,7 @@
 #include "factory_base.hpp"
 #include "function.hpp"
 #include "calculation_graph.hpp"
+#include "cxx_code_printer.hpp"
 
 namespace sym {
 
@@ -113,6 +114,28 @@ class Factory : public FactoryBase {
             }
         }
         return CalculationGraph(input_nodes, output_nodes, rev_repr_map, depends_list, idMapping());
+    }
+
+    CxxCodePrinter cxxCodePrinter(const std::string &ns, const std::string &class_name) {
+        CxxCodePrinter printer(ns, class_name);
+        std::vector<std::string> static_variables, dynamic_variables;
+        for (auto &&[symbol, vlist] : static_inputs) {
+            static_variables.push_back(symbol);
+        }
+        for (auto &&[symbol, vlist] : dynamic_inputs) {
+            dynamic_variables.push_back(symbol);
+        }
+        for (auto &&[symbol, vlist] : static_outputs) {
+            static_variables.push_back(symbol);
+        }
+        for (auto &&[symbol, vlist] : dynamic_outputs) {
+            dynamic_variables.push_back(symbol);
+        }
+
+        printer.setStaticVariables(static_variables, 0, "<under construction>");
+        printer.setDynamicVariables(dynamic_variables, "<under construction>");
+
+        return printer;
     }
 
  protected:
