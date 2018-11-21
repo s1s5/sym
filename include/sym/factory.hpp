@@ -25,14 +25,7 @@ class Factory : public FactoryBase {
     class Digraph {
      public:
         Digraph(const std::vector<Repr> &rev_repr_map_, const std::vector<std::unordered_set<int>> &depends_list_,
-                const std::vector<int> &aliases_) : rev_repr_map(rev_repr_map_), depends_list(depends_list_), aliases(aliases_.size()) {
-            for (size_t i = 0; i < aliases_.size(); i++) {
-                int id = i;
-                while (aliases_[id] >= 0) {
-                    id = aliases_[id];
-                }
-                aliases[i] = id;
-            }
+                const std::vector<int> &id_mapping_) : rev_repr_map(rev_repr_map_), depends_list(depends_list_), id_mapping(id_mapping_) {
         }
 
         friend std::ostream &operator<<(std::ostream &os, const Digraph &d) {
@@ -54,7 +47,7 @@ class Factory : public FactoryBase {
      protected:
         std::vector<Repr> rev_repr_map;
         std::vector<std::unordered_set<int>> depends_list;
-        std::vector<int> aliases;
+        std::vector<int> id_mapping;
     };
 
  public:
@@ -88,7 +81,7 @@ class Factory : public FactoryBase {
  public:
     virtual ~Factory() {}
     Function::shared diff(const Function::shared &func, const Function::shared &var) { return func->diff(var); }
-    Digraph digraph() const { return Digraph(rev_repr_map, depends_list, aliases); }
+    Digraph digraph() const { return Digraph(rev_repr_map, depends_list, idMapping()); }
 
  protected:
     

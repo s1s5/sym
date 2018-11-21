@@ -33,6 +33,9 @@ struct Repr {
         std::stringstream ss;
         for (auto &&item : items) {
             if (item.is_id) {
+                if (id2repr[item.id].invalid) {
+                    throw std::runtime_error("access invalid id");
+                }
                 ss << id2repr[item.id](id2repr);
             } else {
                 ss << item.s;
@@ -40,6 +43,7 @@ struct Repr {
         }
         return ss.str();
     }
+    bool invalid = false;
     std::vector<Item> items;
 };
 
@@ -84,6 +88,7 @@ class FactoryBase {
 
     static void setAliasRepr(int id0, int id1) {
         get()->aliases[id0] = id1;
+        get()->rev_repr_map[id0] = get()->rev_repr_map[id1];
     }
 
     template<class T>
@@ -105,6 +110,17 @@ class FactoryBase {
 
  public:
     virtual ~FactoryBase() {}
+    std::vector<int> idMapping() const {
+        std::vector<int> result(aliases.size());
+        for (size_t i = 0; i < aliases.size(); i++) {
+            int id = i;
+            while (aliases[id] >= 0) {
+                id = aliases[id];
+            }
+            result[i] = id;
+        }
+        return result;
+    }
 
  protected:
     FactoryBase() : num_input_variables(0) {
@@ -118,6 +134,7 @@ class FactoryBase {
             int index = repr_map.size();
             repr_map[repr] = index;
             rev_repr_map.push_back(repr_obj);
+            org_rev_repr_map.push_back(repr_obj);
             depends_list.push_back(depends);
             whole_depends_list.push_back(depends);
             for (auto &&d: depends) {
@@ -138,7 +155,7 @@ class FactoryBase {
  protected:
     int num_input_variables;
     std::unordered_map<std::string, int> repr_map;
-    std::vector<Repr> rev_repr_map;
+    std::vector<Repr> rev_repr_map, org_rev_repr_map;
     std::vector<std::unordered_set<int>> depends_list, whole_depends_list;
     std::vector<int> aliases;
     std::vector<Function*> functions;
