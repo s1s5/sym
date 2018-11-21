@@ -217,16 +217,18 @@ class Factory : public FactoryBase {
                 dynamic_output_nodes[ptr_vlist->at(index)->id()] = symbol + "[" + std::to_string(index) + "]";
             }
         }
-        for (size_t i = 0, j = 0; i < intermediate_nodes.size(); i++) {
+
+        int num_intermediates = 0;
+        for (size_t i = 0; i < intermediate_nodes.size(); i++) {
             if (not intermediate_nodes[i]) {
                 continue;
             }
             if (dynamic_input_nodes.find(i) != dynamic_input_nodes.end()) {
                 continue;
             }
-            static_output_nodes[i] = "_i[" + std::to_string(j) + "]";
-            dynamic_input_nodes[i] = "_i[" + std::to_string(j) + "]";
-            j++;
+            static_output_nodes[i] = "_i[" + std::to_string(num_intermediates) + "]";
+            dynamic_input_nodes[i] = "_i[" + std::to_string(num_intermediates) + "]";
+            num_intermediates++;
         }
 
         CalculationGraph static_dag(static_input_nodes, static_output_nodes, rev_repr_map, depends_list, idMapping());
@@ -235,7 +237,7 @@ class Factory : public FactoryBase {
         sd << static_dag;
         dd << dynamic_dag;
 
-        printer.setStaticVariables(static_variables, 0, sd.str());
+        printer.setStaticVariables(static_variables, num_intermediates, sd.str());
         printer.setDynamicVariables(dynamic_variables, dd.str());
 
         return printer;
