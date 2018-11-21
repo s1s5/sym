@@ -8,7 +8,6 @@
 #ifndef FUNCTION_HPP_
 #define FUNCTION_HPP_
 
-#include <memory>
 #include "factory_base.hpp"
 
 namespace sym {
@@ -21,8 +20,10 @@ class Function : public std::enable_shared_from_this<Function> {
     virtual ~Function() {}
     int id() const { return _id; }
     const std::string &repr() { return FactoryBase::repr(_id); }
+
     virtual shared diff(shared v) const = 0;
     virtual void simplified() const = 0;
+    virtual double eval() const = 0;
 
     template<class T>
     bool is() const { return dynamic_cast<const T*>(this); }
@@ -37,9 +38,13 @@ class Function : public std::enable_shared_from_this<Function> {
 
 class Constant : public Function {
  public:
-    Constant(double value) : Function(std::to_string(value), {}) {}
+    Constant(double value_) : Function(std::to_string(value_), {}), _value(value_) {}
     virtual shared diff(shared v) const override { return std::make_shared<Constant>(0); }
     virtual void simplified() const override {}
+    virtual double eval() const override { return _value; }
+
+ protected:
+    double _value;
 };
 
 inline bool is_zero(const Function::shared &f) {
@@ -62,6 +67,11 @@ class Variable : public Function {
         return std::make_shared<Constant>(0);
     }
     virtual void simplified() const override {}
+    virtual double eval() const override { return _value; }
+
+    void assign(double v) { _value = v; }
+ protected:
+    double _value{0};
 };
 
 std::ostream &operator << (std::ostream &os, const Function::shared &arg) {

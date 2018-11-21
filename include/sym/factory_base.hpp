@@ -10,10 +10,13 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 #include <unordered_set>
 #include <unordered_map>
 
 namespace sym {
+
+class Function;
 
 class FactoryBase {
  public:
@@ -53,6 +56,9 @@ class FactoryBase {
         return factory;
     }
 
+ public:
+    virtual ~FactoryBase() {}
+
  protected:
     FactoryBase() : num_input_variables(0) {
         get_set(this);
@@ -87,8 +93,6 @@ class FactoryBase {
     std::vector<std::unordered_set<int>> depends_list, whole_depends_list;
     std::vector<int> aliases;
 };
-
-
 }  // namespace sym
 
 #endif  // FACTORY_BASE_HPP_
