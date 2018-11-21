@@ -14,11 +14,16 @@ using namespace sym;
 class MyFactory : public Factory {
  public:
     StaticInput x{"x", 2};
+    DynamicInput w{"w", 2};
     StaticOutput y{"y", 2};
+    DynamicOutput z{"z", 3};
     
     void generate() {
         y[0] = x[0] + x[1] * x[1];
-        y[1] = x[0] * x[1];
+        y[1] = sin(w[0] * w[1]);
+        z[0] = 0.5 * x[0];
+        z[1] = cos(w[0] * 0.5);
+        z[2] = exp(w[0] * x[1]);
 
         std::cout << y[0] << ", " << y[1] << std::endl;
 
