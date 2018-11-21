@@ -78,6 +78,7 @@ class FactoryBase {
         return result;
     }
     static const std::unordered_set<int> &wholeDepends(int id) { return get()->_wholeDepends(id); }
+    static bool checkDepends(int my_id, int var_id) { auto &wdl = wholeDepends(my_id); return wdl.find(var_id) != wdl.end(); }
     static std::string repr(int id) {
         return get()->rev_repr_map[id](get()->rev_repr_map);
         // while (get()->aliases[id] >= 0) {
