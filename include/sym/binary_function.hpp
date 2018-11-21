@@ -103,6 +103,7 @@ class Atan2Function : public BinaryFunction {
  public:
     Atan2Function(const Function::shared &arg0_, const Function::shared &arg1_) : BinaryFunction("atan2", arg0_, arg1_) {}
     virtual shared diff(shared v) const override {
+        if (not FactoryBase::checkDepends(id(), v->id())) { return std::make_shared<Constant>(0); }
         // return (f0->diff(var_id) * f1 - f0 * f1->diff(var_id)) / (f0 * f0 + f1 * f1);
         return std::make_shared<SubFunction>(
             std::make_shared<MulFunction>(arg0->diff(v), arg1),
