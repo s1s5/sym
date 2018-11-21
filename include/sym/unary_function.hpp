@@ -153,6 +153,37 @@ inline Function::shared CosFunction::diff(shared v) const {
     return std::make_shared<NegFunction>(std::make_shared<SinFunction>(arg->diff(v)));
 }
 
+Function::shared operator -(const Function::shared &arg) {
+    return std::make_shared<NegFunction>(arg);
+}
+
+Function::shared sin(const Function::shared &arg) {
+    return std::make_shared<SinFunction>(arg);
+}
+
+Function::shared cos(const Function::shared &arg) {
+    return std::make_shared<CosFunction>(arg);
+}
+
+Function::shared asin(const Function::shared &arg) {
+    return std::make_shared<ArcSinFunction>(arg);
+}
+
+Function::shared sqrt(const Function::shared &arg) {
+    return std::make_shared<SquareRootFunction>(arg);
+}
+
+Function::shared exp(const Function::shared &arg) {
+    return std::make_shared<ExpFunction>(arg);
+}
+
+Function::shared log(const Function::shared &arg) {
+    return std::make_shared<LogFunction>(arg);
+}
+
+
+
+
 }  // namespace sym
 
 #endif  // UNARY_FUNCTION_HPP_

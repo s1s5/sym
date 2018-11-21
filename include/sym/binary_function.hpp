@@ -127,8 +127,24 @@ Function::shared operator+(const Function::shared &arg0, const Function::shared 
     return std::make_shared<AddFunction>(arg0, arg1);
 }
 
+Function::shared operator+(const double &arg0, const Function::shared &arg1) {
+    return std::make_shared<AddFunction>(std::make_shared<Constant>(arg0), arg1);
+}
+
+Function::shared operator+(const Function::shared &arg0, const double &arg1) {
+    return std::make_shared<AddFunction>(arg0, std::make_shared<Constant>(arg1));
+}
+
 Function::shared operator*(const Function::shared &arg0, const Function::shared &arg1) {
     return std::make_shared<MulFunction>(arg0, arg1);
+}
+
+Function::shared operator*(const double &arg0, const Function::shared &arg1) {
+    return std::make_shared<MulFunction>(std::make_shared<Constant>(arg0), arg1);
+}
+
+Function::shared operator*(const Function::shared &arg0, const double &arg1) {
+    return std::make_shared<MulFunction>(arg0, std::make_shared<Constant>(arg1));
 }
 
 }  // namespace sym
