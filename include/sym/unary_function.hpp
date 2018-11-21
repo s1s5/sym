@@ -9,12 +9,21 @@
 #define UNARY_FUNCTION_HPP_
 
 #include "function.hpp"
+#include <cmath>
 
 namespace sym {
 
-class NegFunction : public Function {
+class UnaryFunction : public Function {
  public:
-    NegFunction(const Function::shared &arg_) : Function(_repr("(-", arg_->id(), ")"), FactoryBase::depends(arg_->id())), arg(arg_) {}
+    UnaryFunction(const std::string &operator_, const Function::shared &arg_) : Function(_repr("(", operator_, "(", arg_->id(), "))"), FactoryBase::depends(arg_->id())), arg(arg_) {}
+
+ protected:
+    Function::shared arg;
+};
+
+class NegFunction : public UnaryFunction {
+ public:
+    NegFunction(const Function::shared &arg_) : UnaryFunction("-", arg_) {}
 
     virtual shared diff(shared v) const override {
         return std::make_shared<NegFunction>(arg->diff(v));
@@ -26,10 +35,42 @@ class NegFunction : public Function {
         }
     }
     virtual double eval() const override { return - arg->eval(); }
-    
- protected:
-    Function::shared arg;
 };
+
+
+class SinFunction : public UnaryFunction {
+ public:
+    SinFunction(const Function::shared &arg_) : UnaryFunction("sin", arg_) {}
+    virtual shared diff(shared v) const override;
+    virtual void simplified() const override {
+        arg->simplified();
+    }
+    virtual double eval() const override { return std::sin(arg->eval()); }
+};
+
+class CosFunction : public UnaryFunction {
+ public:
+    CosFunction(const Function::shared &arg_) : UnaryFunction("cos", arg_) {}
+    virtual shared diff(shared v) const override;
+    virtual void simplified() const override {
+        arg->simplified();
+    }
+    virtual double eval() const override { return std::cos(arg->eval()); }
+};
+
+class ArcSinFunction : public UnaryFunction {
+};
+
+class Atan2Function : public UnaryFunction {
+};
+
+inline Function::shared SinFunction::diff(shared v) const {
+    return std::make_shared<CosFunction>(arg->diff(v));
+}
+
+inline Function::shared CosFunction::diff(shared v) const {
+    return std::make_shared<NegFunction>(std::make_shared<SinFunction>(arg->diff(v)));
+}
 
 }  // namespace sym
 
