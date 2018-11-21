@@ -32,6 +32,11 @@ class Input : public Tagged {
     }
     
     std::shared_ptr<Variable> operator [](int index) const { return v[index]; }
+    void assign(const std::vector<double> &values) {
+        for (size_t i = 0; i < values.size(); i++) {
+            v[i]->assign(values[i]);
+        }
+    }
     // Function::shared operator [](int index) const { return v[index]; }
 
  protected:
