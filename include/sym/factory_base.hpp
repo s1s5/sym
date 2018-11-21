@@ -89,6 +89,8 @@ class FactoryBase {
     static void setAliasRepr(int id0, int id1) {
         get()->aliases[id0] = id1;
         get()->rev_repr_map[id0] = get()->rev_repr_map[id1];
+        get()->depends_list[id0] = get()->depends_list[id1];
+        get()->whole_depends_list[id0] = get()->whole_depends_list[id1];
     }
 
     template<class T>

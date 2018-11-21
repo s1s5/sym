@@ -132,8 +132,92 @@ class Factory : public FactoryBase {
             dynamic_variables.push_back(symbol);
         }
 
-        printer.setStaticVariables(static_variables, 0, "<under construction>");
-        printer.setDynamicVariables(dynamic_variables, "<under construction>");
+        std::vector<bool> dynamic_nodes(repr_map.size(), false);
+        std::vector<bool> intermediate_nodes(repr_map.size(), false);
+        for (size_t i = 0; i < whole_depends_list.size(); i++) {
+            for (auto &&[symbol, vlist] : dynamic_inputs) {
+                for (auto &&v : vlist) {
+                    if (whole_depends_list[i].find(v->id()) != whole_depends_list[i].end()) {
+                        dynamic_nodes[i] = true;
+                        break;
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < dynamic_nodes.size(); i++) {
+            if (not dynamic_nodes[i]) {
+                continue;
+            }
+            for (auto &&d : depends_list[i]) {
+                if (dynamic_nodes[d]) {
+                    continue;
+                }
+                intermediate_nodes[d] = true;
+            }
+        }
+        for (auto &&[symbol, vlist] : dynamic_outputs) {
+            for (auto &&v : *vlist) {
+                if (dynamic_nodes[v->id()]) {
+                    continue;
+                }
+                intermediate_nodes[v->id()] = true;
+            }
+        }
+
+        std::unordered_map<int, std::string> static_input_nodes, dynamic_input_nodes;
+        std::unordered_map<int, std::string> static_output_nodes, dynamic_output_nodes;
+
+        for (auto &&[symbol, vlist] : static_inputs) {
+            for (auto &&v : vlist) {
+                static_input_nodes[v->id()] = rev_repr_map[v->id()](rev_repr_map);
+            }
+        }
+        for (auto &&[symbol, vlist] : dynamic_inputs) {
+            for (auto &&v : vlist) {
+                dynamic_input_nodes[v->id()] = rev_repr_map[v->id()](rev_repr_map);
+            }
+        }
+        for (auto &&[symbol, ptr_vlist] : static_outputs) {
+            for (size_t index = 0; index < ptr_vlist->size(); index++) {
+                if (not ptr_vlist->at(index)) {
+                    throw std::runtime_error("output variable is not set");
+                }
+                int id = ptr_vlist->at(index)->id();
+                if (dynamic_nodes[id]) {
+                    dynamic_output_nodes[id] = symbol + "[" + std::to_string(index) + "]";
+                } else {
+                    static_output_nodes[id] = symbol + "[" + std::to_string(index) + "]";
+                }
+            }
+        }
+        for (auto &&[symbol, ptr_vlist] : dynamic_outputs) {
+            for (size_t index = 0; index < ptr_vlist->size(); index++) {
+                if (not ptr_vlist->at(index)) {
+                    throw std::runtime_error("output variable is not set");
+                }
+                dynamic_output_nodes[ptr_vlist->at(index)->id()] = symbol + "[" + std::to_string(index) + "]";
+            }
+        }
+        for (size_t i = 0, j = 0; i < intermediate_nodes.size(); i++) {
+            if (not intermediate_nodes[i]) {
+                continue;
+            }
+            if (dynamic_input_nodes.find(i) != dynamic_input_nodes.end()) {
+                continue;
+            }
+            static_output_nodes[i] = "_i[" + std::to_string(j) + "]";
+            dynamic_input_nodes[i] = "_i[" + std::to_string(j) + "]";
+            j++;
+        }
+
+        CalculationGraph static_dag(static_input_nodes, static_output_nodes, rev_repr_map, depends_list, idMapping());
+        CalculationGraph dynamic_dag(dynamic_input_nodes, dynamic_output_nodes, rev_repr_map, depends_list, idMapping());
+        std::stringstream sd, dd;
+        sd << static_dag;
+        dd << dynamic_dag;
+
+        printer.setStaticVariables(static_variables, 0, sd.str());
+        printer.setDynamicVariables(dynamic_variables, dd.str());
 
         return printer;
     }

@@ -10,7 +10,6 @@
 
 #include <algorithm>
 #include "factory_base.hpp"
-#include <iostream>
 
 namespace sym {
 
@@ -62,7 +61,7 @@ class CalculationGraph {
             if (depths[i] == 1<<30) {
                 continue;
             }
-            if (input_nodes.find(i) != input_nodes.end()) {
+            if (output_nodes.find(i) == output_nodes.end() and input_nodes.find(i) != input_nodes.end()) {
                 continue;
             }
             test_order.emplace_back(depths[i], i);
@@ -89,7 +88,7 @@ class CalculationGraph {
     }
 
  protected:
-    std::string tvar_type{"IntermediateScalar"}, tvar{"_t"}, line_prefix{""};
+    std::string tvar_type{"IntermediateScalar"}, tvar{"_t"}, line_prefix{"        "};
     std::unordered_map<int, std::string> input_nodes, output_nodes;
     std::vector<Repr> repr_list;
     std::vector<std::tuple<std::string, std::string, int>> output_order;

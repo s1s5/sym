@@ -26,7 +26,7 @@ class CxxCodePrinter {
             std::string line_prefix = "    ";
             os << line_prefix << f.type << (f.type == "" ? "" : " ") << f.name << "(" << f.args << ") "
                << (f.initials == "" ? "" : ": ") << f.initials << (f.initials == "" ? "" : " ") << "{" << std::endl;
-            os << f.contents << std::endl;
+            os << f.contents;
             os << line_prefix << "}" << std::endl;
             return os;
         }
@@ -51,7 +51,7 @@ class CxxCodePrinter {
         if (num_intermediates > 0) {
             members.push_back("IntermediateScalar _i[" + std::to_string(num_intermediates) + "]");
         }
-        constructor.contents = "        refresh();";
+        constructor.contents = "        refresh();\n";
 
         auto &f = function_list[0];
         f.type = "void";
@@ -66,7 +66,7 @@ class CxxCodePrinter {
         f.name = "operator()";
         f.args = "";
         for (auto &&s : variables) {
-            f.args += std::string(f.args == "" ? "" : ", ") + std::string("ProbeScalar *" + s + "_");
+            f.args += std::string(f.args == "" ? "" : ", ") + std::string("ProbeScalar *" + s);
         }
         f.contents = contents;
     }
