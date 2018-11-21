@@ -99,6 +99,30 @@ class DivFunction : public BinaryFunction {
     virtual double eval() const override { return arg0->eval() / arg1->eval(); }
 };
 
+class Atan2Function : public BinaryFunction {
+ public:
+    Atan2Function(const Function::shared &arg0_, const Function::shared &arg1_) : BinaryFunction("atan2", arg0_, arg1_) {}
+    virtual shared diff(shared v) const override {
+        // return (f0->diff(var_id) * f1 - f0 * f1->diff(var_id)) / (f0 * f0 + f1 * f1);
+        return std::make_shared<SubFunction>(
+            std::make_shared<MulFunction>(arg0->diff(v), arg1),
+            std::make_shared<DivFunction>(
+                std::make_shared<MulFunction>(arg0, arg1->diff(v)),
+                std::make_shared<AddFunction>(
+                    std::make_shared<MulFunction>(arg0, arg0),
+                    std::make_shared<MulFunction>(arg1, arg1))));
+    }
+    virtual void simplified() const override {
+        arg0->simplified();
+        arg1->simplified();
+        if (is_constant(arg0) and is_constant(arg1)) {
+            auto a = std::make_shared<Constant>(std::atan2(arg0->eval(), arg1->eval()));
+            FactoryBase::setAliasRepr(id(), a->id());
+        }
+    }
+    virtual double eval() const override { return std::atan2(arg0->eval(), arg1->eval()); }
+};
+
 Function::shared operator+(const Function::shared &arg0, const Function::shared &arg1) {
     return std::make_shared<AddFunction>(arg0, arg1);
 }
