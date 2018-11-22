@@ -135,7 +135,7 @@ class Factory : public FactoryBase {
                 }
             }
         }
-        for (int i = 0; i < dynamic_nodes.size(); i++) {
+        for (size_t i = 0; i < dynamic_nodes.size(); i++) {
             if (not dynamic_nodes[i]) {
                 continue;
             }
