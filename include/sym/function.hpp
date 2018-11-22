@@ -65,6 +65,14 @@ inline bool is_constant(const Function::shared &f) {
     return FactoryBase::is<Constant>(f->id());
 }
 
+inline Function::shared zero() {
+    return std::make_shared<Constant>(0);
+}
+
+inline Function::shared one() {
+    return std::make_shared<Constant>(1);
+}
+
 class Variable : public Function {
  public:
     Variable(const std::string &symbol) : Function(_repr(symbol), {}) {}
@@ -93,7 +101,15 @@ Function::shared Function::diff(shared v) const {
     return result;
 }
 
-std::ostream &operator<<(std::ostream &os, const Function::shared &arg) {
+inline bool operator == (const Function::shared &arg0, const Function::shared &arg1) {
+    return FactoryBase::alias(arg0->id()) == FactoryBase::alias(arg1->id());
+}
+
+inline bool operator != (const Function::shared &arg0, const Function::shared &arg1) {
+    return not (arg0 == arg1);
+}
+
+inline std::ostream &operator<<(std::ostream &os, const Function::shared &arg) {
     if (not arg) { return os << std::string("<null>"); }
     return os << arg->repr();
 }

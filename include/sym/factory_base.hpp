@@ -90,6 +90,10 @@ class FactoryBase {
         get()->whole_depends_list[id0] = get()->whole_depends_list[id1];
     }
 
+    static int alias(int id) {
+        return get()->aliases[id] < 0 ? id : get()->aliases[id] ;
+    }
+
     template<class T>
     static bool is(int id) {
         while (get()->aliases[id] >= 0) {
