@@ -39,8 +39,8 @@ int main(int argc, char **argv) {
     std::cout << f.wholeGraph() << std::endl;
     std::cout << f.cxxCodePrinter("namespace_name", "ClassName") << std::endl;
 
-    auto x = std::make_shared<sym::Variable>("x");
-    auto y = std::make_shared<sym::Variable>("y");
+    auto x = _make_shared<sym::Variable>("x");
+    auto y = _make_shared<sym::Variable>("y");
     
     auto z = x + y;
     auto dz = z->diff(x);

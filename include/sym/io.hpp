@@ -26,7 +26,7 @@ class Input : public Tagged {
  public:
     Input(IOTag tag_, const std::string &symbol_, int num_variables) : Tagged(tag_, symbol_) {
         for (int i = 0; i < num_variables; i++) {
-            v.push_back(std::make_shared<Variable>(symbol + "[" + std::to_string(i) + "]"));
+            v.push_back(_make_shared<Variable>(symbol + "[" + std::to_string(i) + "]"));
         }
         Factory::addInput(tag_, symbol, v);
     }

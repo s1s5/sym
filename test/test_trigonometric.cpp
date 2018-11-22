@@ -48,8 +48,6 @@ TEST_F(trigonometric, cos_eval) {
 TEST_F(trigonometric, cos_diff) {
     y[0] = cos(x[0]);
     y[1] = cos(x[0] * x[1]);
-    std::cout << diff(y[0], x[0]) << std::endl;
-    std::cout << (- sin(x[0])) << std::endl;
     ASSERT_EQ(diff(y[0], x[0])->id(), (- sin(x[0]))->id());
     ASSERT_EQ(diff(y[0], x[1])->id(), zero()->id());
 }

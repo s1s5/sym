@@ -33,15 +33,24 @@ class Function : public std::enable_shared_from_this<Function> {
 
  protected:
     virtual shared _diff(shared v) const = 0;
-    Function(const Repr &repr, const std::unordered_set<int> &depends) : _id(FactoryBase::add(repr, depends, this)) {}
+    Function(const Repr &repr_, const std::unordered_set<int> &depends_) : _mem_repr(repr_), _mem_depends(depends_), _id(-1) {}
 
  private:
+    void initId() {
+        _id = FactoryBase::add(_mem_repr, _mem_depends, shared_from_this());
+    }
+    template<class T, class ...Args> friend std::shared_ptr<T> _make_shared(Args... args);
+
+ private:
+    Repr _mem_repr;
+    std::unordered_set<int> _mem_depends;
     int _id;
 };
 
 template<class T, class ...Args>
 std::shared_ptr<T> _make_shared(Args... args) {
     std::shared_ptr<T> r = std::make_shared<T>(args...);
+    r->initId();
     r->simplified();
     return r;
 }
@@ -69,6 +78,11 @@ inline bool is_one(const Function::shared &f) {
     return f->repr() == one_string;
 }
 
+inline bool is_negative_one(const Function::shared &f) {
+    static const std::string negative_one_string = std::to_string(-1.0);
+    return f->repr() == negative_one_string;
+}
+
 inline bool is_constant(const Function::shared &f) {
     return FactoryBase::is<Constant>(f->id());
 }
@@ -78,6 +92,10 @@ inline Function::shared zero() {
 }
 
 inline Function::shared one() {
+    return _make_shared<Constant>(1);
+}
+
+inline Function::shared negative_one() {
     return _make_shared<Constant>(1);
 }
 

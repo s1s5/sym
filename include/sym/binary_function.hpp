@@ -61,17 +61,7 @@ class SubFunction : public BinaryFunction {
 class MulFunction : public BinaryFunction {
  public:
     MulFunction(const Function::shared &arg0, const Function::shared &arg1) : BinaryFunction("*", arg0, arg1) {}
-    virtual void simplified() const override {
-        arg0->simplified();
-        arg1->simplified();
-        if (is_zero(arg0) or is_zero(arg1)) {
-            FactoryBase::setAliasRepr(id(), zero()->id());
-        } else if (is_one(arg0)) {
-            FactoryBase::setAliasRepr(id(), arg1->id());
-        } else if (is_one(arg1)) {
-            FactoryBase::setAliasRepr(id(), arg0->id());
-        }
-    }
+    virtual void simplified() const override;
     virtual double eval() const override { return arg0->eval() * arg1->eval(); }
 
  protected:

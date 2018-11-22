@@ -59,7 +59,7 @@ class FactoryBase {
     static FactoryBase *get() {
         return get_set(nullptr);
     }
-    static int add(const Repr &repr, const std::unordered_set<int> &depends, Function * f) {
+    static int add(const Repr &repr, const std::unordered_set<int> &depends, std::shared_ptr<Function> f) {
         return get()->_add(repr, depends, f);
     }
     
@@ -102,7 +102,7 @@ class FactoryBase {
         while (get()->aliases[id] >= 0) {
             id = get()->aliases[id];
         }
-        return dynamic_cast<T*>(get()->functions[id]);
+        return dynamic_cast<T*>(get()->functions[id].get());
     }
 
  protected:
@@ -134,7 +134,7 @@ class FactoryBase {
         get_set(this);
     }
 
-    int _add(const Repr &repr_obj, const std::unordered_set<int> &depends, Function *f ) {
+    int _add(const Repr &repr_obj, const std::unordered_set<int> &depends, std::shared_ptr<Function> f) {
         std::string repr = repr_obj(rev_repr_map);
         auto iter = repr_map.find(repr);
         if (iter == repr_map.end()) {
@@ -165,7 +165,7 @@ class FactoryBase {
     std::vector<Repr> rev_repr_map, org_rev_repr_map;
     std::vector<std::unordered_set<int>> depends_list, whole_depends_list;
     std::vector<int> aliases;
-    std::vector<Function*> functions;
+    std::vector<std::shared_ptr<Function>> functions;
 };
 }  // namespace sym
 
