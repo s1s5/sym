@@ -28,10 +28,6 @@ class BinaryFunction : public Function {
 class AddFunction : public BinaryFunction {
  public:
     AddFunction(const Function::shared &arg0, const Function::shared &arg1) : BinaryFunction("+", arg0, arg1) {}
-    virtual shared diff(shared v) const override {
-        if (not FactoryBase::checkDepends(id(), v->id())) { return std::make_shared<Constant>(0); }
-        return std::make_shared<AddFunction>(arg0->diff(v), arg1->diff(v));
-    }
     virtual void simplified() const override {
         arg0->simplified();
         arg1->simplified();
@@ -42,30 +38,31 @@ class AddFunction : public BinaryFunction {
         }
     }
     virtual double eval() const override { return arg0->eval() + arg1->eval(); }
+
+ protected:
+    virtual shared _diff(shared v) const override {
+        return std::make_shared<AddFunction>(arg0->diff(v), arg1->diff(v));
+    }
 };
 
 class SubFunction : public BinaryFunction {
  public:
     SubFunction(const Function::shared &arg0, const Function::shared &arg1) : BinaryFunction("-", arg0, arg1) {}
-    virtual shared diff(shared v) const override {
-        if (not FactoryBase::checkDepends(id(), v->id())) { return std::make_shared<Constant>(0); }
-        return std::make_shared<SubFunction>(arg0->diff(v), arg1->diff(v));
-    }
     virtual void simplified() const override {
         arg0->simplified();
         arg1->simplified();
     }
     virtual double eval() const override { return arg0->eval() - arg1->eval(); }
+
+ protected:
+    virtual shared _diff(shared v) const override {
+        return std::make_shared<SubFunction>(arg0->diff(v), arg1->diff(v));
+    }
 };
 
 class MulFunction : public BinaryFunction {
  public:
     MulFunction(const Function::shared &arg0, const Function::shared &arg1) : BinaryFunction("*", arg0, arg1) {}
-    virtual shared diff(shared v) const override {
-        if (not FactoryBase::checkDepends(id(), v->id())) { return std::make_shared<Constant>(0); }
-        return std::make_shared<AddFunction>(std::make_shared<MulFunction>(arg0->diff(v), arg1),
-                                             std::make_shared<MulFunction>(arg0, arg1->diff(v)));
-    }
     virtual void simplified() const override {
         arg0->simplified();
         arg1->simplified();
@@ -78,18 +75,17 @@ class MulFunction : public BinaryFunction {
         }
     }
     virtual double eval() const override { return arg0->eval() * arg1->eval(); }
+
+ protected:
+    virtual shared _diff(shared v) const override {
+        return std::make_shared<AddFunction>(std::make_shared<MulFunction>(arg0->diff(v), arg1),
+                                             std::make_shared<MulFunction>(arg0, arg1->diff(v)));
+    }
 };
 
 class DivFunction : public BinaryFunction {
  public:
     DivFunction(const Function::shared &arg0, const Function::shared &arg1) : BinaryFunction("/", arg0, arg1) {}
-    virtual shared diff(shared v) const override {
-        if (not FactoryBase::checkDepends(id(), v->id())) { return std::make_shared<Constant>(0); }
-        return std::make_shared<SubFunction>(
-            std::make_shared<DivFunction>(arg0->diff(v), arg1),
-            std::make_shared<DivFunction>(std::make_shared<DivFunction>(arg0, arg1->diff(v)),
-                                          std::make_shared<DivFunction>(arg1, arg1)));
-    }
 
     virtual void simplified() const override {
         arg0->simplified();
@@ -97,22 +93,19 @@ class DivFunction : public BinaryFunction {
         if (is_zero(arg0)) { FactoryBase::setAliasRepr(id(), arg0->id()); }
     }
     virtual double eval() const override { return arg0->eval() / arg1->eval(); }
+
+ protected:
+    virtual shared _diff(shared v) const override {
+        return std::make_shared<SubFunction>(
+            std::make_shared<DivFunction>(arg0->diff(v), arg1),
+            std::make_shared<DivFunction>(std::make_shared<DivFunction>(arg0, arg1->diff(v)),
+                                          std::make_shared<DivFunction>(arg1, arg1)));
+    }
 };
 
 class Atan2Function : public BinaryFunction {
  public:
     Atan2Function(const Function::shared &arg0_, const Function::shared &arg1_) : BinaryFunction("atan2", arg0_, arg1_) {}
-    virtual shared diff(shared v) const override {
-        if (not FactoryBase::checkDepends(id(), v->id())) { return std::make_shared<Constant>(0); }
-        // return (f0->diff(var_id) * f1 - f0 * f1->diff(var_id)) / (f0 * f0 + f1 * f1);
-        return std::make_shared<SubFunction>(
-            std::make_shared<MulFunction>(arg0->diff(v), arg1),
-            std::make_shared<DivFunction>(
-                std::make_shared<MulFunction>(arg0, arg1->diff(v)),
-                std::make_shared<AddFunction>(
-                    std::make_shared<MulFunction>(arg0, arg0),
-                    std::make_shared<MulFunction>(arg1, arg1))));
-    }
     virtual void simplified() const override {
         arg0->simplified();
         arg1->simplified();
@@ -122,6 +115,18 @@ class Atan2Function : public BinaryFunction {
         }
     }
     virtual double eval() const override { return std::atan2(arg0->eval(), arg1->eval()); }
+
+ protected:
+    virtual shared _diff(shared v) const override {
+        // return (f0->diff(var_id) * f1 - f0 * f1->diff(var_id)) / (f0 * f0 + f1 * f1);
+        return std::make_shared<SubFunction>(
+            std::make_shared<MulFunction>(arg0->diff(v), arg1),
+            std::make_shared<DivFunction>(
+                std::make_shared<MulFunction>(arg0, arg1->diff(v)),
+                std::make_shared<AddFunction>(
+                    std::make_shared<MulFunction>(arg0, arg0),
+                    std::make_shared<MulFunction>(arg1, arg1))));
+    }
 };
 
 Function::shared operator+(const Function::shared &arg0, const Function::shared &arg1) {

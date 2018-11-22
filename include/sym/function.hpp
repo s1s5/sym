@@ -1,5 +1,5 @@
 /**
- * Copyright 
+ * Copyright
  * @file function.hpp
  * @brief
  * @author Shogo Sawai
@@ -21,17 +21,19 @@ class Function : public std::enable_shared_from_this<Function> {
     int id() const { return _id; }
     std::string repr() { return FactoryBase::repr(_id); }
 
-    virtual shared diff(shared v) const = 0;
+    virtual shared diff(shared v) const final;
     virtual void simplified() const = 0;
     virtual double eval() const = 0;
 
-    template<class T>
-    bool is() const { return dynamic_cast<const T*>(this); }
+    template <class T>
+    bool is() const {
+        return dynamic_cast<const T *>(this);
+    }
 
  protected:
-    Function(const Repr &repr, const std::unordered_set<int> &depends) : _id(FactoryBase::add(repr, depends, this)) {
-    }
-    
+    virtual shared _diff(shared v) const = 0;
+    Function(const Repr &repr, const std::unordered_set<int> &depends) : _id(FactoryBase::add(repr, depends, this)) {}
+
  private:
     int _id;
 };
@@ -39,9 +41,11 @@ class Function : public std::enable_shared_from_this<Function> {
 class Constant : public Function {
  public:
     Constant(double value_) : Function(_repr(std::to_string(value_)), {}), _value(value_) {}
-    virtual shared diff(shared v) const override { return std::make_shared<Constant>(0); }
     virtual void simplified() const override {}
     virtual double eval() const override { return _value; }
+
+ protected:
+    virtual shared _diff(shared v) const override { return std::make_shared<Constant>(0); }
 
  protected:
     double _value;
@@ -64,24 +68,33 @@ inline bool is_constant(const Function::shared &f) {
 class Variable : public Function {
  public:
     Variable(const std::string &symbol) : Function(_repr(symbol), {}) {}
-    virtual shared diff(shared v) const override {
-        if (v->id() == id()) {
-            return std::make_shared<Constant>(1);
-        }
-        return std::make_shared<Constant>(0);
-    }
     virtual void simplified() const override {}
     virtual double eval() const override { return _value; }
-
     void assign(double v) { _value = v; }
+
+ protected:
+    virtual shared _diff(shared v) const override {
+        if (v->id() == id()) { return std::make_shared<Constant>(1); }
+        return std::make_shared<Constant>(0);
+    }
+
  protected:
     double _value{0};
 };
 
-std::ostream &operator << (std::ostream &os, const Function::shared &arg) {
-    if (not arg) {
-        return os << std::string("<null>");
+Function::shared Function::diff(shared v) const {
+    if (id() == v->id()) {
+        return std::make_shared<Constant>(1);
+    } else if (not FactoryBase::checkDepends(id(), v->id())) {
+        return std::make_shared<Constant>(0);
     }
+    auto result = _diff(v);
+    result->simplified();
+    return result;
+}
+
+std::ostream &operator<<(std::ostream &os, const Function::shared &arg) {
+    if (not arg) { return os << std::string("<null>"); }
     return os << arg->repr();
 }
 
