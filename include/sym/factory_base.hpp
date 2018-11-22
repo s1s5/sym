@@ -84,6 +84,9 @@ class FactoryBase {
     }
 
     static void setAliasRepr(int id0, int id1) {
+        if (id0 == id1) {
+            return;
+        }
         get()->aliases[id0] = id1;
         get()->rev_repr_map[id0] = get()->rev_repr_map[id1];
         get()->depends_list[id0] = get()->depends_list[id1];
@@ -124,7 +127,8 @@ class FactoryBase {
         }
         return result;
     }
-
+    const std::vector<Repr> &reprList() const { return rev_repr_map; }
+    
  protected:
     FactoryBase() : num_input_variables(0) {
         get_set(this);
