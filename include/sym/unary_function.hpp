@@ -11,7 +11,6 @@
 #include <cmath>
 
 #include "function.hpp"
-#include "binary_function.hpp"
 
 namespace sym {
 
@@ -33,14 +32,14 @@ class NegFunction : public UnaryFunction {
         if (is_zero(arg)) {
             FactoryBase::setAliasRepr(id(), arg->id());
         } else if (is_constant(arg)) {
-            auto a = std::make_shared<Constant>(- arg->eval());
+            auto a = _make_shared<Constant>(- arg->eval());
             FactoryBase::setAliasRepr(id(), a->id());
         }
     }
     virtual double eval() const override { return -arg->eval(); }
  protected:
     virtual shared _diff(shared v) const override {
-        return std::make_shared<NegFunction>(arg->diff(v));
+        return _make_shared<NegFunction>(arg->diff(v));
     }
 };
 
@@ -50,7 +49,7 @@ class SinFunction : public UnaryFunction {
     virtual void simplified() const override {
         arg->simplified();
         if (is_constant(arg)) {
-            auto a = std::make_shared<Constant>(std::sin(arg->eval()));
+            auto a = _make_shared<Constant>(std::sin(arg->eval()));
             FactoryBase::setAliasRepr(id(), a->id());
         }
     }
@@ -65,7 +64,7 @@ class CosFunction : public UnaryFunction {
     virtual void simplified() const override {
         arg->simplified();
         if (is_constant(arg)) {
-            auto a = std::make_shared<Constant>(std::cos(arg->eval()));
+            auto a = _make_shared<Constant>(std::cos(arg->eval()));
             FactoryBase::setAliasRepr(id(), a->id());
         }
     }
@@ -80,17 +79,13 @@ class SquareRootFunction : public UnaryFunction {
     virtual void simplified() const override {
         arg->simplified();
         if (is_constant(arg)) {
-            auto a = std::make_shared<Constant>(std::sqrt(arg->eval()));
+            auto a = _make_shared<Constant>(std::sqrt(arg->eval()));
             FactoryBase::setAliasRepr(id(), a->id());
         }
     }
     virtual double eval() const override { return std::sqrt(arg->eval()); }
  protected:
-    virtual shared _diff(shared v) const override {
-        return std::make_shared<MulFunction>(
-            std::make_shared<Constant>(0.5),
-            std::make_shared<DivFunction>(arg->diff(v), arg));
-    }
+    virtual shared _diff(shared v) const override;
 };
 
 class ExpFunction : public UnaryFunction {
@@ -99,15 +94,13 @@ class ExpFunction : public UnaryFunction {
     virtual void simplified() const override {
         arg->simplified();
         if (is_constant(arg)) {
-            auto a = std::make_shared<Constant>(std::exp(arg->eval()));
+            auto a = _make_shared<Constant>(std::exp(arg->eval()));
             FactoryBase::setAliasRepr(id(), a->id());
         }
     }
     virtual double eval() const override { return std::asin(arg->eval()); }
  protected:
-    virtual shared _diff(shared v) const override {
-        return std::make_shared<MulFunction>(arg->diff(v), arg);
-    }
+    virtual shared _diff(shared v) const override;
 };
 
 class LogFunction : public UnaryFunction {
@@ -116,15 +109,13 @@ class LogFunction : public UnaryFunction {
     virtual void simplified() const override {
         arg->simplified();
         if (is_constant(arg)) {
-            auto a = std::make_shared<Constant>(std::log(arg->eval()));
+            auto a = _make_shared<Constant>(std::log(arg->eval()));
             FactoryBase::setAliasRepr(id(), a->id());
         }
     }
     virtual double eval() const override { return std::asin(arg->eval()); }
  protected:
-    virtual shared _diff(shared v) const override {
-        return std::make_shared<DivFunction>(arg->diff(v), arg);
-    }
+    virtual shared _diff(shared v) const override;
 };
 
 class ArcSinFunction : public UnaryFunction {
@@ -133,62 +124,52 @@ class ArcSinFunction : public UnaryFunction {
     virtual void simplified() const override {
         arg->simplified();
         if (is_constant(arg)) {
-            auto a = std::make_shared<Constant>(std::asin(arg->eval()));
+            auto a = _make_shared<Constant>(std::asin(arg->eval()));
             FactoryBase::setAliasRepr(id(), a->id());
         }
     }
     virtual double eval() const override { return std::asin(arg->eval()); }
  protected:
-    virtual shared _diff(shared v) const override {
-        return std::make_shared<DivFunction>(
-            arg->diff(v),
-            std::make_shared<SquareRootFunction>(
-                std::make_shared<SubFunction>(
-                    std::make_shared<Constant>(1),
-                    std::make_shared<MulFunction>(arg, arg))));
-    }
+    virtual shared _diff(shared v) const override;
 };
 
 inline Function::shared SinFunction::_diff(shared v) const {
-    if (not FactoryBase::checkDepends(id(), v->id())) { return std::make_shared<Constant>(0); }
-    return std::make_shared<CosFunction>(arg->diff(v));
+    if (not FactoryBase::checkDepends(id(), v->id())) { return _make_shared<Constant>(0); }
+    return _make_shared<CosFunction>(arg->diff(v));
 }
 
 inline Function::shared CosFunction::_diff(shared v) const {
-    if (not FactoryBase::checkDepends(id(), v->id())) { return std::make_shared<Constant>(0); }
-    return std::make_shared<NegFunction>(std::make_shared<SinFunction>(arg->diff(v)));
+    if (not FactoryBase::checkDepends(id(), v->id())) { return _make_shared<Constant>(0); }
+    return _make_shared<NegFunction>(_make_shared<SinFunction>(arg->diff(v)));
 }
 
 Function::shared operator -(const Function::shared &arg) {
-    return std::make_shared<NegFunction>(arg);
+    return _make_shared<NegFunction>(arg);
 }
 
 Function::shared sin(const Function::shared &arg) {
-    return std::make_shared<SinFunction>(arg);
+    return _make_shared<SinFunction>(arg);
 }
 
 Function::shared cos(const Function::shared &arg) {
-    return std::make_shared<CosFunction>(arg);
+    return _make_shared<CosFunction>(arg);
 }
 
 Function::shared asin(const Function::shared &arg) {
-    return std::make_shared<ArcSinFunction>(arg);
+    return _make_shared<ArcSinFunction>(arg);
 }
 
 Function::shared sqrt(const Function::shared &arg) {
-    return std::make_shared<SquareRootFunction>(arg);
+    return _make_shared<SquareRootFunction>(arg);
 }
 
 Function::shared exp(const Function::shared &arg) {
-    return std::make_shared<ExpFunction>(arg);
+    return _make_shared<ExpFunction>(arg);
 }
 
 Function::shared log(const Function::shared &arg) {
-    return std::make_shared<LogFunction>(arg);
+    return _make_shared<LogFunction>(arg);
 }
-
-
-
 
 }  // namespace sym
 

@@ -16,5 +16,7 @@
 #include "cxx_code_printer.hpp"
 #include "factory.hpp"
 #include "io.hpp"
+#include "unary_function_impl.hpp"
+#include "binary_function_impl.hpp"
 
 #endif  // SYM_HPP_
