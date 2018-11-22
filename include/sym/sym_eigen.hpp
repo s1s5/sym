@@ -25,5 +25,22 @@ template<> struct NumTraits<sym::Symbol> : NumTraits<int32_t> {
 };
 }  // namespace Eigen
 
+namespace sym {
+
+#define DEF_SYM_SQUARE_MATRIX(N) using Matrix ## N ## s = Eigen::Matrix<Symbol, N, N>
+DEF_SYM_SQUARE_MATRIX(1);
+DEF_SYM_SQUARE_MATRIX(2);
+DEF_SYM_SQUARE_MATRIX(3);
+DEF_SYM_SQUARE_MATRIX(4);
+#undef DEF_SYM_SQUARE_MATRIX
+
+#define DEF_SYM_VECTOR(N) using Vector ## N ## s = Eigen::Matrix<Symbol, N, 1>
+DEF_SYM_VECTOR(1);
+DEF_SYM_VECTOR(2);
+DEF_SYM_VECTOR(3);
+DEF_SYM_VECTOR(4);
+#undef DEF_SYM_VECTOR
+
+}  // namespace sym
 
 #endif  // SYM_EIGEN_HPP_
