@@ -28,9 +28,9 @@ TEST_F(four_arithmetic_operations, add_eval) {
 
 TEST_F(four_arithmetic_operations, add_diff) {
     y[0] = x[0] + x[1];
-    ASSERT_EQ(diff(y[0], x[0])->id(), one()->id());
-    ASSERT_EQ(diff(y[0], x[1])->id(), one()->id());
-    ASSERT_EQ(diff(y[0], x[2])->id(), zero()->id());
+    ASSERT_EQ(diff(y[0], x[0]), one());
+    ASSERT_EQ(diff(y[0], x[1]), one());
+    ASSERT_EQ(diff(y[0], x[2]), zero());
 }
 
 TEST_F(four_arithmetic_operations, sub_eval) {
@@ -43,9 +43,9 @@ TEST_F(four_arithmetic_operations, sub_eval) {
 
 TEST_F(four_arithmetic_operations, sub_diff) {
     y[0] = x[0] - x[1];
-    ASSERT_EQ(diff(y[0], x[0])->id(), one()->id());
-    ASSERT_EQ(diff(y[0], x[1])->id(), (- one())->id());
-    ASSERT_EQ(diff(y[0], x[2])->id(), zero()->id());
+    ASSERT_EQ(diff(y[0], x[0]), one());
+    ASSERT_EQ(diff(y[0], x[1]), (- one()));
+    ASSERT_EQ(diff(y[0], x[2]), zero());
 }
 
 TEST_F(four_arithmetic_operations, mul_eval) {
@@ -59,10 +59,10 @@ TEST_F(four_arithmetic_operations, mul_eval) {
 TEST_F(four_arithmetic_operations, mul_diff) {
     y[0] = x[0] * x[1];
     y[1] = x[0] * x[0];
-    ASSERT_EQ(diff(y[0], x[0])->id(), x[1]->id());
-    ASSERT_EQ(diff(y[0], x[1])->id(), x[0]->id());
-    ASSERT_EQ(diff(y[0], x[2])->id(), zero()->id());
-    ASSERT_EQ(diff(y[1], x[0])->id(), (x[0] + x[0])->id());
+    ASSERT_EQ(diff(y[0], x[0]), x[1]);
+    ASSERT_EQ(diff(y[0], x[1]), x[0]);
+    ASSERT_EQ(diff(y[0], x[2]), zero());
+    ASSERT_EQ(diff(y[1], x[0]), (x[0] + x[0]));
 }
 
 TEST_F(four_arithmetic_operations, div_eval) {
@@ -73,9 +73,9 @@ TEST_F(four_arithmetic_operations, div_eval) {
 
 TEST_F(four_arithmetic_operations, div_diff) {
     y[0] = x[0] / x[1];
-    ASSERT_EQ(diff(y[0], x[0])->id(), (1 / x[1])->id());
-    ASSERT_EQ(diff(y[0], x[1])->id(), (- (x[0] / (x[1] * x[1])))->id());
-    ASSERT_EQ(diff(y[0], x[2])->id(), zero()->id());
+    ASSERT_EQ(diff(y[0], x[0]), (1 / x[1]));
+    ASSERT_EQ(diff(y[0], x[1]), (- (x[0] / (x[1] * x[1]))));
+    ASSERT_EQ(diff(y[0], x[2]), zero());
 }
 
 }  // namespace

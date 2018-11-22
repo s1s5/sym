@@ -26,8 +26,8 @@ TEST_F(unary, neg_eval) {
 
 TEST_F(unary, neg_diff) {
     y[0] = - x[0];
-    ASSERT_EQ(diff(y[0], x[0])->id(), (- one())->id());
-    ASSERT_EQ(diff(y[0], x[1])->id(), zero()->id());
+    ASSERT_EQ(diff(y[0], x[0]), (- one()));
+    ASSERT_EQ(diff(y[0], x[1]), zero());
 }
 
 TEST_F(unary, sqrt_eval) {
@@ -44,9 +44,9 @@ TEST_F(unary, sqrt_diff) {
     x.assign({2, 2, 3});
     y[0] = sqrt(x[0]);
     y[1] = sqrt(x[0] * x[1]);
-    ASSERT_EQ(diff(y[0], x[0])->id(), (1 / (2 * sqrt(x[0])))->id());
+    ASSERT_EQ(diff(y[0], x[0]), (1 / (2 * sqrt(x[0]))));
     ASSERT_NEAR(diff(y[0], x[0])->eval(), (1.0 / (2 * std::sqrt(2))), 1.0e-8);
-    ASSERT_EQ(diff(y[0], x[1])->id(), zero()->id());
+    ASSERT_EQ(diff(y[0], x[1]), zero());
 }
 
 TEST_F(unary, exp_eval) {
@@ -63,9 +63,9 @@ TEST_F(unary, exp_diff) {
     x.assign({2, 3, 4});
     y[0] = exp(x[0]);
     y[1] = exp(x[0] * x[1]);
-    ASSERT_EQ(diff(y[0], x[0])->id(), exp(x[0])->id());
+    ASSERT_EQ(diff(y[0], x[0]), exp(x[0]));
     ASSERT_EQ(diff(y[0], x[0])->eval(), std::exp(2));
-    ASSERT_EQ(diff(y[0], x[1])->id(), zero()->id());
+    ASSERT_EQ(diff(y[0], x[1]), zero());
 }
 
 TEST_F(unary, log_eval) {
@@ -82,8 +82,8 @@ TEST_F(unary, log_diff) {
     x.assign({2, 3, 4});
     y[0] = log(x[0]);
     y[1] = log(x[0] * x[1]);
-    ASSERT_EQ(diff(y[0], x[0])->id(), (1 / x[0])->id());
-    ASSERT_EQ(diff(y[0], x[1])->id(), zero()->id());
+    ASSERT_EQ(diff(y[0], x[0]), (1 / x[0]));
+    ASSERT_EQ(diff(y[0], x[1]), zero());
 }
 
 
