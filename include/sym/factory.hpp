@@ -14,6 +14,7 @@
 #include "function.hpp"
 #include "calculation_graph.hpp"
 #include "cxx_code_printer.hpp"
+#include "digraph.hpp"
 
 namespace sym {
 
@@ -23,35 +24,6 @@ enum class IOTag {
 };
 
 class Factory : public FactoryBase {
- public:
-    class Digraph {
-     public:
-        Digraph(const std::vector<Repr> &rev_repr_map_, const std::vector<std::unordered_set<int>> &depends_list_,
-                const std::vector<int> &id_mapping_) : rev_repr_map(rev_repr_map_), depends_list(depends_list_), id_mapping(id_mapping_) {
-        }
-
-        friend std::ostream &operator<<(std::ostream &os, const Digraph &d) {
-            std::vector<Repr> cur_rev_repr_map = d.rev_repr_map;
-            os << "digraph graphname {" << std::endl;
-            for (size_t i = 0; i < d.rev_repr_map.size(); i++) {
-                std::string result = cur_rev_repr_map[i](cur_rev_repr_map);
-                os << "    n" << i << " [label=\"" << i << "=" << result << "\"];" << std::endl;
-                cur_rev_repr_map[i] = _repr(std::to_string(i));
-            }
-            for (size_t i = 0; i < d.depends_list.size(); i++) {
-                for (auto &&j : d.depends_list[i]) {
-                    os << "    n" << j << " -> n" << i << ";" << std::endl;
-                }
-            }
-            return os << "}" << std::endl;
-        }
-        
-     protected:
-        std::vector<Repr> rev_repr_map;
-        std::vector<std::unordered_set<int>> depends_list;
-        std::vector<int> id_mapping;
-    };
-
  public:
     static void addInput(IOTag tag, const std::string &symbol, const std::vector<std::shared_ptr<Variable>> &inputs_) {
         switch (tag) {
