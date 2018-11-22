@@ -97,3 +97,9 @@ f.refresh();  // recalculate with pointer that is set in constructor
 f(x1_new);
 std::cout << y[0] << ", " << y[1] << std::endl;
 ```
+
+# todo
+- [ ] implement expand/factor
+- [ ] optimize calculation graph
+- [ ] multiple generator single source
+- [ ] generic test
