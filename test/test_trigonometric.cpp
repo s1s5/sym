@@ -33,6 +33,7 @@ TEST_F(trigonometric, sin_diff) {
     y[1] = sin(x[0] * x[1]);
     ASSERT_EQ(diff(y[0], x[0])->id(), cos(x[0])->id());
     ASSERT_EQ(diff(y[0], x[1])->id(), zero()->id());
+    ASSERT_EQ(diff(y[1], x[0])->id(), (x[1] * cos(x[0] * x[1]))->id());
 }
 
 TEST_F(trigonometric, cos_eval) {
@@ -50,6 +51,7 @@ TEST_F(trigonometric, cos_diff) {
     y[1] = cos(x[0] * x[1]);
     ASSERT_EQ(diff(y[0], x[0])->id(), (- sin(x[0]))->id());
     ASSERT_EQ(diff(y[0], x[1])->id(), zero()->id());
+    ASSERT_EQ(diff(y[1], x[0])->id(), ((- x[1]) * sin(x[0] * x[1]))->id());
 }
 
 
