@@ -98,7 +98,7 @@ class ExpFunction : public UnaryFunction {
             FactoryBase::setAliasRepr(id(), a->id());
         }
     }
-    virtual double eval() const override { return std::asin(arg->eval()); }
+    virtual double eval() const override { return std::exp(arg->eval()); }
  protected:
     virtual shared _diff(shared v) const override;
 };
@@ -113,7 +113,7 @@ class LogFunction : public UnaryFunction {
             FactoryBase::setAliasRepr(id(), a->id());
         }
     }
-    virtual double eval() const override { return std::asin(arg->eval()); }
+    virtual double eval() const override { return std::log(arg->eval()); }
  protected:
     virtual shared _diff(shared v) const override;
 };
@@ -133,41 +133,31 @@ class ArcSinFunction : public UnaryFunction {
     virtual shared _diff(shared v) const override;
 };
 
-inline Function::shared SinFunction::_diff(shared v) const {
-    if (not FactoryBase::checkDepends(id(), v->id())) { return _make_shared<Constant>(0); }
-    return _make_shared<CosFunction>(arg->diff(v));
-}
-
-inline Function::shared CosFunction::_diff(shared v) const {
-    if (not FactoryBase::checkDepends(id(), v->id())) { return _make_shared<Constant>(0); }
-    return _make_shared<NegFunction>(_make_shared<SinFunction>(arg->diff(v)));
-}
-
-Function::shared operator -(const Function::shared &arg) {
+inline Function::shared operator -(const Function::shared &arg) {
     return _make_shared<NegFunction>(arg);
 }
 
-Function::shared sin(const Function::shared &arg) {
+inline Function::shared sin(const Function::shared &arg) {
     return _make_shared<SinFunction>(arg);
 }
 
-Function::shared cos(const Function::shared &arg) {
+inline Function::shared cos(const Function::shared &arg) {
     return _make_shared<CosFunction>(arg);
 }
 
-Function::shared asin(const Function::shared &arg) {
+inline Function::shared asin(const Function::shared &arg) {
     return _make_shared<ArcSinFunction>(arg);
 }
 
-Function::shared sqrt(const Function::shared &arg) {
+inline Function::shared sqrt(const Function::shared &arg) {
     return _make_shared<SquareRootFunction>(arg);
 }
 
-Function::shared exp(const Function::shared &arg) {
+inline Function::shared exp(const Function::shared &arg) {
     return _make_shared<ExpFunction>(arg);
 }
 
-Function::shared log(const Function::shared &arg) {
+inline Function::shared log(const Function::shared &arg) {
     return _make_shared<LogFunction>(arg);
 }
 

@@ -13,21 +13,35 @@
 
 namespace sym {
 
-Function::shared SquareRootFunction::_diff(shared v) const {
+inline Function::shared SinFunction::_diff(shared v) const {
     return _make_shared<MulFunction>(
-        _make_shared<Constant>(0.5),
-        _make_shared<DivFunction>(arg->diff(v), arg));
+        arg->diff(v),
+        _make_shared<CosFunction>(arg));
 }
 
-Function::shared ExpFunction::_diff(shared v) const {
-    return _make_shared<MulFunction>(arg->diff(v), arg);
+inline Function::shared CosFunction::_diff(shared v) const {
+    return _make_shared<MulFunction>(
+        _make_shared<NegFunction>(arg->diff(v)),
+        _make_shared<SinFunction>(arg));
 }
 
-Function::shared LogFunction::_diff(shared v) const {
+inline Function::shared SquareRootFunction::_diff(shared v) const {
+    return _make_shared<DivFunction>(
+        arg->diff(v), 
+        _make_shared<MulFunction>(
+            _make_shared<Constant>(2),
+            _make_shared<SquareRootFunction>(arg)));
+}
+
+inline Function::shared ExpFunction::_diff(shared v) const {
+    return _make_shared<MulFunction>(arg->diff(v), _make_shared<ExpFunction>(arg));
+}
+
+inline Function::shared LogFunction::_diff(shared v) const {
     return _make_shared<DivFunction>(arg->diff(v), arg);
 }
 
-Function::shared ArcSinFunction::_diff(shared v) const {
+inline Function::shared ArcSinFunction::_diff(shared v) const {
     return _make_shared<DivFunction>(
         arg->diff(v),
         _make_shared<SquareRootFunction>(
