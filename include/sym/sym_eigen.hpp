@@ -12,7 +12,10 @@
 #include "sym/sym.hpp"
 
 namespace Eigen {
-template<> struct NumTraits<sym::Symbol> : NumTraits<int32_t> {
+template<> struct NumTraits<sym::Symbol> : NumTraits<int> {
+    using Real = sym::Symbol;
+    using NonInteger = sym::Symbol;
+    using NonNested = sym::Symbol;
     enum {
         IsComplex = 0,
         IsInteger = 1,
@@ -41,6 +44,57 @@ DEF_SYM_VECTOR(3);
 DEF_SYM_VECTOR(4);
 #undef DEF_SYM_VECTOR
 
+template<int R, int C, int Major = Eigen::ColMajor>
+Eigen::Map<const Eigen::Matrix<Symbol, R, C, Major>> asMatrix(const Input &input) {
+    if (R * C > input.size()) {
+        throw std::runtime_error("size mismatch");
+    }
+    return Eigen::Map<const Eigen::Matrix<Symbol, R, C, Major>>(input.data());
+}
+
+template<int R, int C, int Major = Eigen::ColMajor>
+Eigen::Map<const Eigen::Matrix<Symbol, R, C, Major>> asMatrix(const Output &output) {
+    if (R * C > output.size()) {
+        throw std::runtime_error("size mismatch");
+    }
+    return Eigen::Map<const Eigen::Matrix<Symbol, R, C, Major>>(output.data());
+}
+
+template<int R, int C, int Major = Eigen::ColMajor>
+Eigen::Map<Eigen::Matrix<Symbol, R, C, Major>> asMatrix(Output &output) {
+    if (R * C > output.size()) {
+        throw std::runtime_error("size mismatch");
+    }
+    return Eigen::Map<Eigen::Matrix<Symbol, R, C, Major>>(output.data());
+}
+
+template<int N>
+Eigen::Map<const Eigen::Matrix<Symbol, N, 1>> asVector(const Input &input) {
+    if (N > input.size()) {
+        throw std::runtime_error("size mismatch");
+    }
+    return Eigen::Map<const Eigen::Matrix<Symbol, N, 1>>(input.data());
+}
+
+template<int N>
+Eigen::Map<const Eigen::Matrix<Symbol, N, 1>> asVector(const Output &output) {
+    if (N > output.size()) {
+        throw std::runtime_error("size mismatch");
+    }
+    return Eigen::Map<const Eigen::Matrix<Symbol, N, 1>>(output.data());
+}
+
+template<int N>
+Eigen::Map<Eigen::Matrix<Symbol, N, 1>> asVector(Output &output) {
+    if (N > output.size()) {
+        throw std::runtime_error("size mismatch");
+    }
+    return Eigen::Map<Eigen::Matrix<Symbol, N, 1>>(output.data());
+}
+
+inline double eval(const Symbol &func) {
+    return func->eval();
+}
 }  // namespace sym
 
 #endif  // SYM_EIGEN_HPP_

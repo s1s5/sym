@@ -30,7 +30,8 @@ class Input : public Tagged {
         }
         Factory::addInput(tag_, symbol, v);
     }
-    
+    size_t size() const { return v.size(); }
+    const Symbol *data() const { return v.data(); }
     Symbol operator [](int index) const { return v[index]; }
     void assign(const std::vector<double> &values) {
         for (size_t i = 0; i < values.size(); i++) {
@@ -50,6 +51,9 @@ class Output : public Tagged {
         Factory::addOutput(tag_, symbol, &v);
     }
 
+    size_t size() const { return v.size(); }
+    Symbol *data() { return v.data(); }
+    const Symbol *data() const { return v.data(); }
     Symbol &operator [](int index) { return v[index]; }
 
  protected:

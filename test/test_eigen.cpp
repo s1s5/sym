@@ -47,4 +47,37 @@ TEST_F(eigen, 001) {
     ASSERT_EQ(r(2, 2), 1);
 }
 
+TEST_F(eigen, 002) {
+    {
+        Eigen::Map<const Matrix2s> m(x0.data());
+        // std::cout << m << std::endl;
+        // col major
+        ASSERT_EQ(m(0, 0), x0[0]);
+        ASSERT_EQ(m(1, 0), x0[1]);
+        ASSERT_EQ(m(0, 1), x0[2]);
+        ASSERT_EQ(m(1, 1), x0[3]);
+    }
+    {
+        auto m = asMatrix<2, 2>(x0);
+        // std::cout << m << std::endl;
+        // col major
+        ASSERT_EQ(m(0, 0), x0[0]);
+        ASSERT_EQ(m(1, 0), x0[1]);
+        ASSERT_EQ(m(0, 1), x0[2]);
+        ASSERT_EQ(m(1, 1), x0[3]);
+    }
+}
+
+TEST_F(eigen, 003) {
+    Eigen::Vector4d r(1, 2, 3, 4);
+    x0.assign({r(0), r(1), r(2), r(3), });
+    auto v = asVector<4>(x0);
+    // std::cout << v.transpose() << std::endl;
+    // std::cout << v.normalized().transpose() << std::endl;
+    // std::cout << (v.unaryExpr(&eval) - r) << std::endl;
+    // std::cout << (v.normalized().unaryExpr(&eval) - r.normalized()) << std::endl;
+    ASSERT_NEAR((v.unaryExpr(&eval) - r).norm(), 0, 1.0e-8);
+    ASSERT_NEAR((v.normalized().unaryExpr(&eval) - r.normalized()).norm(), 0, 1.0e-8);
+}
+
 }  // namespace
