@@ -1,13 +1,12 @@
 set(CPPUT_MAIN ${CMAKE_CURRENT_SOURCE_DIR}/cpput_main.cpp)
 set(CPPUT_LIBS dl)
 
-macro(py_add_test module_name)
-  set(list_var "${ARGN}")
-  foreach(test_filename IN LISTS list_var)
-    add_executable(test_${module_name}_${test_filename} test_${test_filename}.cpp ${CPPUT_MAIN})
-    target_link_libraries(test_${module_name}_${test_filename} ${CPPUT_LIBS})
-    add_test(
-      NAME test_${module_name}_${test_filename}
-      COMMAND test_${module_name}_${test_filename})
-  endforeach()
+macro(sym_add_test test_filename)
+  add_executable(test_${test_filename} test_${test_filename}.cpp ${CPPUT_MAIN})
+  target_link_libraries(test_${test_filename} ${CPPUT_LIBS})
+  add_test(
+    NAME test_${test_filename}
+    COMMAND test_${test_filename})
 endmacro()
+
+sym_add_test(four_arithmetic_operations)
