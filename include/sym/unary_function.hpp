@@ -23,24 +23,18 @@ class UnaryFunction : public Function {
     Symbol arg;
 };
 
+class ASExtractor;
 class NegFunction : public UnaryFunction {
  public:
     NegFunction(const Symbol &arg_) : UnaryFunction("-", arg_) {}
-
-    virtual void simplified() const override {
-        arg->simplified();
-        if (is_zero(arg)) {
-            FactoryBase::setAliasRepr(id(), arg->id());
-        } else if (is_constant(arg)) {
-            auto a = make_symbol<Constant>(- arg->eval());
-            FactoryBase::setAliasRepr(id(), a->id());
-        }
-    }
+    virtual void simplified() const override;
     virtual double eval() const override { return -arg->eval(); }
  protected:
     virtual Symbol _diff(Symbol v) const override {
         return make_symbol<NegFunction>(arg->diff(v));
     }
+
+    friend class ASExtractor;
 };
 
 class SinFunction : public UnaryFunction {

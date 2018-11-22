@@ -10,8 +10,25 @@
 
 #include "unary_function.hpp"
 #include "binary_function.hpp"
+#include "as_extractor.hpp"
 
 namespace sym {
+
+inline void NegFunction::simplified() const {
+    arg->simplified();
+    if (is_zero(arg)) {
+        FactoryBase::setAliasRepr(id(), arg->id());
+    } else if (is_constant(arg)) {
+        auto a = make_symbol<Constant>(- arg->eval());
+        FactoryBase::setAliasRepr(id(), a->id());
+    }
+    ASExtractor ex;
+    ex.addSub(arg);
+    if (ex.camBeSimplified()) {
+        auto a = ex.simplified();
+        FactoryBase::setAliasRepr(id(), a->id());
+    }
+}
 
 inline Symbol SinFunction::_diff(Symbol v) const {
     return make_symbol<MulFunction>(

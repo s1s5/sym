@@ -10,8 +10,27 @@
 
 #include "binary_function.hpp"
 #include "unary_function.hpp"
+#include "as_extractor.hpp"
 
 namespace sym {
+
+inline void AddFunction::simplified() const  {
+    arg0->simplified();
+    arg1->simplified();
+    if (is_zero(arg0)) {
+        FactoryBase::setAliasRepr(id(), arg1->id());
+    } else if (is_zero(arg1)) {
+        FactoryBase::setAliasRepr(id(), arg0->id());
+    }
+
+    ASExtractor ex;
+    ex.addAdd(arg0);
+    ex.addAdd(arg1);
+    if (ex.camBeSimplified()) {
+        auto a = ex.simplified();
+        FactoryBase::setAliasRepr(id(), a->id());
+    }
+}
 
 inline void SubFunction::simplified() const {
     arg0->simplified();
@@ -21,6 +40,14 @@ inline void SubFunction::simplified() const {
         FactoryBase::setAliasRepr(id(), a->id());
     } else if (is_zero(arg1)) {
         FactoryBase::setAliasRepr(id(), arg0->id());
+    }
+
+    ASExtractor ex;
+    ex.addAdd(arg0);
+    ex.addSub(arg1);
+    if (ex.camBeSimplified()) {
+        auto a = ex.simplified();
+        FactoryBase::setAliasRepr(id(), a->id());
     }
 }
 

@@ -26,24 +26,19 @@ class BinaryFunction : public Function {
     Symbol arg0, arg1;
 };
 
+class ASExtractor;
 class AddFunction : public BinaryFunction {
  public:
     AddFunction(const Symbol &arg0, const Symbol &arg1) : BinaryFunction("+", arg0, arg1) {}
-    virtual void simplified() const override {
-        arg0->simplified();
-        arg1->simplified();
-        if (is_zero(arg0)) {
-            FactoryBase::setAliasRepr(id(), arg1->id());
-        } else if (is_zero(arg1)) {
-            FactoryBase::setAliasRepr(id(), arg0->id());
-        }
-    }
+    virtual void simplified() const override;
     virtual double eval() const override { return arg0->eval() + arg1->eval(); }
 
  protected:
     virtual Symbol _diff(Symbol v) const override {
         return make_symbol<AddFunction>(arg0->diff(v), arg1->diff(v));
     }
+
+    friend class ASExtractor;
 };
 
 class SubFunction : public BinaryFunction {
@@ -56,6 +51,8 @@ class SubFunction : public BinaryFunction {
     virtual Symbol _diff(Symbol v) const override {
         return make_symbol<SubFunction>(arg0->diff(v), arg1->diff(v));
     }
+
+    friend class ASExtractor;
 };
 
 class MulFunction : public BinaryFunction {

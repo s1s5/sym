@@ -9,6 +9,7 @@ macro(sym_add_test test_filename)
     COMMAND test_${test_filename})
 endmacro()
 
+sym_add_test(simplify)
 sym_add_test(four_arithmetic_operations)
 sym_add_test(unary)
 sym_add_test(trigonometric)

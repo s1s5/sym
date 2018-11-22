@@ -21,19 +21,25 @@ class Function : public std::enable_shared_from_this<Function> {
         Symbol(){}
         Symbol(const std::shared_ptr<Function> &f) : std::shared_ptr<Function>(f) {}
         Symbol(double v); //  : std::shared_ptr<Function>(_make_shared<Constant>(v)) {}
-        
+
+        Symbol & operator = (const double &v);
         template<class T>
         typename std::enable_if<std::is_base_of<Function, typename T::element_type>::value, Symbol &>::type
         operator=(const T &v) {
             std::shared_ptr<Function>::operator=(std::dynamic_pointer_cast<Function>(v));
             return *this;
         }
+
+        Symbol & operator += (const double &v);
+        Symbol & operator -= (const double &v);
+        Symbol & operator += (const Symbol &v);
+        Symbol & operator -= (const Symbol &v);
         
-        bool operator == (const Symbol &rhs) {
+        bool operator == (const Symbol &rhs) const {
             return get()->id() == rhs->id();
         }
         
-        bool operator != (const Symbol &rhs) {
+        bool operator != (const Symbol &rhs) const {
             return not (operator == (rhs));
         }
     };
@@ -50,7 +56,12 @@ class Function : public std::enable_shared_from_this<Function> {
 
     template <class T>
     bool is() const {
-        return dynamic_cast<const T *>(this);
+        return FactoryBase::is<T>(id());
+    }
+
+    template <class T>
+    std::shared_ptr<T> ptr() {
+        return FactoryBase::ptr<T>(id());
     }
 
  protected:
@@ -159,6 +170,7 @@ inline Function::Symbol Function::diff(Symbol v) const {
 }
 
 inline Function::Symbol::Symbol(double v) : std::shared_ptr<Function>(_make_shared<Constant>(v)) {}
+inline Function::Symbol & Function::Symbol::operator = (const double &v) { *this = Symbol(v); return *this; }
 
 inline std::ostream &operator<<(std::ostream &os, const Symbol &arg) {
     if (not arg) { return os << std::string("<null>"); }

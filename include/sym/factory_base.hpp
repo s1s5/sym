@@ -69,6 +69,14 @@ class FactoryBase {
         return dynamic_cast<T*>(get()->functions[id].get());
     }
 
+    template<class T>
+    static std::shared_ptr<T> ptr(int id) {
+        while (get()->aliases[id] >= 0) {
+            id = get()->aliases[id];
+        }
+        return std::dynamic_pointer_cast<T>(get()->functions[id]);
+    }
+
  protected:
     static FactoryBase *get_set(FactoryBase *current) {
         static FactoryBase *factory = nullptr;
