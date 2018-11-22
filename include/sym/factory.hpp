@@ -56,7 +56,7 @@ class Factory : public FactoryBase {
     virtual ~Factory() {}
     Symbol diff(const Symbol &func, const Symbol &var) { return func->diff(var); }
     Symbol expand(const Symbol &s) {
-        // TOOD: implement
+        // TODO: implement
         return s;
     }
 
