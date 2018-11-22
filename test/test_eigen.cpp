@@ -43,6 +43,7 @@ TEST_F(eigen, 000) {
             m1(i, j) = x1[2 * i + j];
         }
     }
+    m0(1, 1) = 0;
     std::cout << m0 << std::endl;
     std::cout << m0 * m1 << std::endl;
 }

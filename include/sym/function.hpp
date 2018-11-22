@@ -147,7 +147,7 @@ class Variable : public Function {
     double _value{0};
 };
 
-Function::Symbol Function::diff(Symbol v) const {
+inline Function::Symbol Function::diff(Symbol v) const {
     if (id() == v->id()) {
         return make_symbol<Constant>(1);
     } else if (not FactoryBase::checkDepends(id(), v->id())) {
@@ -158,11 +158,12 @@ Function::Symbol Function::diff(Symbol v) const {
     return result;
 }
 
-std::ostream &operator<<(std::ostream &os, const Symbol &arg) {
+inline Function::Symbol::Symbol(double v) : std::shared_ptr<Function>(_make_shared<Constant>(v)) {}
+
+inline std::ostream &operator<<(std::ostream &os, const Symbol &arg) {
     if (not arg) { return os << std::string("<null>"); }
     return os << arg->repr();
 }
-
 
 // template<class T0, class T1>
 // typename std::enable_if<std::is_base_of<Function, typename T0>::value
