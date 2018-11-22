@@ -14,15 +14,37 @@ namespace sym {
 
 class Function : public std::enable_shared_from_this<Function> {
  public:
-    using shared = std::shared_ptr<Function>;
-
+    // using shared = std::shared_ptr<Function>;
+    
+    class Symbol : public std::shared_ptr<Function> {
+     public:
+        Symbol(){}
+        Symbol(const std::shared_ptr<Function> &f) : std::shared_ptr<Function>(f) {}
+        Symbol(double v); //  : std::shared_ptr<Function>(_make_shared<Constant>(v)) {}
+        
+        template<class T>
+        typename std::enable_if<std::is_base_of<Function, typename T::element_type>::value, Symbol &>::type
+        operator=(const T &v) {
+            std::shared_ptr<Function>::operator=(std::dynamic_pointer_cast<Function>(v));
+            return *this;
+        }
+        
+        bool operator == (const Symbol &rhs) {
+            return get()->id() == rhs->id();
+        }
+        
+        bool operator != (const Symbol &rhs) {
+            return not (operator == (rhs));
+        }
+    };
+    
  public:
     virtual ~Function() {}
     int id() const { return FactoryBase::alias(_id); }
     int orgId() const { return _id; }
     std::string repr() const { return FactoryBase::repr(_id); }
 
-    virtual shared diff(shared v) const final;
+    virtual Symbol diff(Symbol v) const final;
     virtual void simplified() const = 0;
     virtual double eval() const = 0;
 
@@ -32,7 +54,7 @@ class Function : public std::enable_shared_from_this<Function> {
     }
 
  protected:
-    virtual shared _diff(shared v) const = 0;
+    virtual Symbol _diff(Symbol v) const = 0;
     Function(const Repr &repr_, const std::unordered_set<int> &depends_) : _mem_repr(repr_), _mem_depends(depends_), _id(-1) {}
 
  private:
@@ -47,13 +69,20 @@ class Function : public std::enable_shared_from_this<Function> {
     int _id;
 };
 
-using S = std::shared_ptr<Function>;
-
 template<class T, class ...Args>
 std::shared_ptr<T> _make_shared(Args... args) {
     std::shared_ptr<T> r = std::make_shared<T>(args...);
     r->initId();
     r->simplified();
+    return r;
+}
+
+using Symbol = Function::Symbol;
+
+template<class T, class ...Args>
+Symbol make_symbol(Args... args) {
+    Symbol r;
+    r = _make_shared<T>(args...);
     return r;
 }
 
@@ -64,41 +93,41 @@ class Constant : public Function {
     virtual double eval() const override { return _value; }
 
  protected:
-    virtual shared _diff(shared v) const override { return _make_shared<Constant>(0); }
+    virtual Symbol _diff(Symbol v) const override { return make_symbol<Constant>(0); }
 
  protected:
     double _value;
 };
 
-inline bool is_zero(const Function::shared &f) {
+inline bool is_zero(const Symbol &f) {
     static const std::string zero_string = std::to_string(0.0);
     return f->repr() == zero_string;
 }
 
-inline bool is_one(const Function::shared &f) {
+inline bool is_one(const Symbol &f) {
     static const std::string one_string = std::to_string(1.0);
     return f->repr() == one_string;
 }
 
-inline bool is_negative_one(const Function::shared &f) {
+inline bool is_negative_one(const Symbol &f) {
     static const std::string negative_one_string = std::to_string(-1.0);
     return f->repr() == negative_one_string;
 }
 
-inline bool is_constant(const Function::shared &f) {
+inline bool is_constant(const Symbol &f) {
     return FactoryBase::is<Constant>(f->id());
 }
 
-inline Function::shared zero() {
-    return _make_shared<Constant>(0);
+inline Symbol zero() {
+    return make_symbol<Constant>(0);
 }
 
-inline Function::shared one() {
-    return _make_shared<Constant>(1);
+inline Symbol one() {
+    return make_symbol<Constant>(1);
 }
 
-inline Function::shared negative_one() {
-    return _make_shared<Constant>(1);
+inline Symbol negative_one() {
+    return make_symbol<Constant>(1);
 }
 
 class Variable : public Function {
@@ -109,29 +138,27 @@ class Variable : public Function {
     void assign(double v) { _value = v; }
 
  protected:
-    virtual shared _diff(shared v) const override {
-        if (v->id() == id()) { return _make_shared<Constant>(1); }
-        return _make_shared<Constant>(0);
+    virtual Symbol _diff(Symbol v) const override {
+        if (v->id() == id()) { return make_symbol<Constant>(1); }
+        return make_symbol<Constant>(0);
     }
 
  protected:
     double _value{0};
 };
 
-Function::shared Function::diff(shared v) const {
+Function::Symbol Function::diff(Symbol v) const {
     if (id() == v->id()) {
-        return _make_shared<Constant>(1);
+        return make_symbol<Constant>(1);
     } else if (not FactoryBase::checkDepends(id(), v->id())) {
-        return _make_shared<Constant>(0);
+        return make_symbol<Constant>(0);
     }
     auto result = _diff(v);
     result->simplified();
     return result;
 }
 
-template<class T>
-typename std::enable_if<std::is_base_of<Function, typename T::element_type>::value, std::ostream &>::type
-operator<<(std::ostream &os, const T &arg) {
+std::ostream &operator<<(std::ostream &os, const Symbol &arg) {
     if (not arg) { return os << std::string("<null>"); }
     return os << arg->repr();
 }

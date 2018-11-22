@@ -13,41 +13,41 @@
 
 namespace sym {
 
-inline Function::shared SinFunction::_diff(shared v) const {
-    return _make_shared<MulFunction>(
+inline Symbol SinFunction::_diff(Symbol v) const {
+    return make_symbol<MulFunction>(
         arg->diff(v),
-        _make_shared<CosFunction>(arg));
+        make_symbol<CosFunction>(arg));
 }
 
-inline Function::shared CosFunction::_diff(shared v) const {
-    return _make_shared<MulFunction>(
-        _make_shared<NegFunction>(arg->diff(v)),
-        _make_shared<SinFunction>(arg));
+inline Symbol CosFunction::_diff(Symbol v) const {
+    return make_symbol<MulFunction>(
+        make_symbol<NegFunction>(arg->diff(v)),
+        make_symbol<SinFunction>(arg));
 }
 
-inline Function::shared SquareRootFunction::_diff(shared v) const {
-    return _make_shared<DivFunction>(
+inline Symbol SquareRootFunction::_diff(Symbol v) const {
+    return make_symbol<DivFunction>(
         arg->diff(v), 
-        _make_shared<MulFunction>(
-            _make_shared<Constant>(2),
-            _make_shared<SquareRootFunction>(arg)));
+        make_symbol<MulFunction>(
+            make_symbol<Constant>(2),
+            make_symbol<SquareRootFunction>(arg)));
 }
 
-inline Function::shared ExpFunction::_diff(shared v) const {
-    return _make_shared<MulFunction>(arg->diff(v), _make_shared<ExpFunction>(arg));
+inline Symbol ExpFunction::_diff(Symbol v) const {
+    return make_symbol<MulFunction>(arg->diff(v), make_symbol<ExpFunction>(arg));
 }
 
-inline Function::shared LogFunction::_diff(shared v) const {
-    return _make_shared<DivFunction>(arg->diff(v), arg);
+inline Symbol LogFunction::_diff(Symbol v) const {
+    return make_symbol<DivFunction>(arg->diff(v), arg);
 }
 
-inline Function::shared ArcSinFunction::_diff(shared v) const {
-    return _make_shared<DivFunction>(
+inline Symbol ArcSinFunction::_diff(Symbol v) const {
+    return make_symbol<DivFunction>(
         arg->diff(v),
-        _make_shared<SquareRootFunction>(
-            _make_shared<SubFunction>(
-                _make_shared<Constant>(1),
-                _make_shared<MulFunction>(arg, arg))));
+        make_symbol<SquareRootFunction>(
+            make_symbol<SubFunction>(
+                make_symbol<Constant>(1),
+                make_symbol<MulFunction>(arg, arg))));
 }
 
 }  // namespace sym

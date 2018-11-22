@@ -16,19 +16,19 @@ namespace sym {
 
 class BinaryFunction : public Function {
  public:
-    BinaryFunction(const std::string &operator_, const Function::shared &arg0_, const Function::shared &arg1_)
+    BinaryFunction(const std::string &operator_, const Symbol &arg0_, const Symbol &arg1_)
         : Function(_repr("(", arg0_->id(), operator_, arg1_->id(), ")"),
                    FactoryBase::depends(arg0_->id(), arg1_->id())),
           arg0(arg0_),
           arg1(arg1_) {}
 
  protected:
-    Function::shared arg0, arg1;
+    Symbol arg0, arg1;
 };
 
 class AddFunction : public BinaryFunction {
  public:
-    AddFunction(const Function::shared &arg0, const Function::shared &arg1) : BinaryFunction("+", arg0, arg1) {}
+    AddFunction(const Symbol &arg0, const Symbol &arg1) : BinaryFunction("+", arg0, arg1) {}
     virtual void simplified() const override {
         arg0->simplified();
         arg1->simplified();
@@ -41,39 +41,39 @@ class AddFunction : public BinaryFunction {
     virtual double eval() const override { return arg0->eval() + arg1->eval(); }
 
  protected:
-    virtual shared _diff(shared v) const override {
-        return _make_shared<AddFunction>(arg0->diff(v), arg1->diff(v));
+    virtual Symbol _diff(Symbol v) const override {
+        return make_symbol<AddFunction>(arg0->diff(v), arg1->diff(v));
     }
 };
 
 class SubFunction : public BinaryFunction {
  public:
-    SubFunction(const Function::shared &arg0, const Function::shared &arg1) : BinaryFunction("-", arg0, arg1) {}
+    SubFunction(const Symbol &arg0, const Symbol &arg1) : BinaryFunction("-", arg0, arg1) {}
     virtual void simplified() const override;
     virtual double eval() const override { return arg0->eval() - arg1->eval(); }
 
  protected:
-    virtual shared _diff(shared v) const override {
-        return _make_shared<SubFunction>(arg0->diff(v), arg1->diff(v));
+    virtual Symbol _diff(Symbol v) const override {
+        return make_symbol<SubFunction>(arg0->diff(v), arg1->diff(v));
     }
 };
 
 class MulFunction : public BinaryFunction {
  public:
-    MulFunction(const Function::shared &arg0, const Function::shared &arg1) : BinaryFunction("*", arg0, arg1) {}
+    MulFunction(const Symbol &arg0, const Symbol &arg1) : BinaryFunction("*", arg0, arg1) {}
     virtual void simplified() const override;
     virtual double eval() const override { return arg0->eval() * arg1->eval(); }
 
  protected:
-    virtual shared _diff(shared v) const override {
-        return _make_shared<AddFunction>(_make_shared<MulFunction>(arg0->diff(v), arg1),
-                                             _make_shared<MulFunction>(arg0, arg1->diff(v)));
+    virtual Symbol _diff(Symbol v) const override {
+        return make_symbol<AddFunction>(make_symbol<MulFunction>(arg0->diff(v), arg1),
+                                             make_symbol<MulFunction>(arg0, arg1->diff(v)));
     }
 };
 
 class DivFunction : public BinaryFunction {
  public:
-    DivFunction(const Function::shared &arg0, const Function::shared &arg1) : BinaryFunction("/", arg0, arg1) {}
+    DivFunction(const Symbol &arg0, const Symbol &arg1) : BinaryFunction("/", arg0, arg1) {}
 
     virtual void simplified() const override {
         arg0->simplified();
@@ -87,91 +87,91 @@ class DivFunction : public BinaryFunction {
     virtual double eval() const override { return arg0->eval() / arg1->eval(); }
 
  protected:
-    virtual shared _diff(shared v) const override {
+    virtual Symbol _diff(Symbol v) const override {
         auto d0 = arg0->diff(v);
         auto d1 = arg1->diff(v);
         if (is_zero(d1)) {
-            return _make_shared<DivFunction>(d0, arg1);
+            return make_symbol<DivFunction>(d0, arg1);
         }
-        return _make_shared<SubFunction>(
-            _make_shared<DivFunction>(d0, arg1),
-            _make_shared<DivFunction>(_make_shared<DivFunction>(arg0, d1),
-                                      _make_shared<MulFunction>(arg1, arg1)));
+        return make_symbol<SubFunction>(
+            make_symbol<DivFunction>(d0, arg1),
+            make_symbol<DivFunction>(make_symbol<DivFunction>(arg0, d1),
+                                      make_symbol<MulFunction>(arg1, arg1)));
     }
 };
 
 class Atan2Function : public BinaryFunction {
  public:
-    Atan2Function(const Function::shared &arg0_, const Function::shared &arg1_) : BinaryFunction("atan2", arg0_, arg1_) {}
+    Atan2Function(const Symbol &arg0_, const Symbol &arg1_) : BinaryFunction("atan2", arg0_, arg1_) {}
     virtual void simplified() const override {
         arg0->simplified();
         arg1->simplified();
         if (is_constant(arg0) and is_constant(arg1)) {
-            auto a = _make_shared<Constant>(std::atan2(arg0->eval(), arg1->eval()));
+            auto a = make_symbol<Constant>(std::atan2(arg0->eval(), arg1->eval()));
             FactoryBase::setAliasRepr(id(), a->id());
         }
     }
     virtual double eval() const override { return std::atan2(arg0->eval(), arg1->eval()); }
 
  protected:
-    virtual shared _diff(shared v) const override {
+    virtual Symbol _diff(Symbol v) const override {
         // return (f0->diff(var_id) * f1 - f0 * f1->diff(var_id)) / (f0 * f0 + f1 * f1);
-        return _make_shared<SubFunction>(
-            _make_shared<MulFunction>(arg0->diff(v), arg1),
-            _make_shared<DivFunction>(
-                _make_shared<MulFunction>(arg0, arg1->diff(v)),
-                _make_shared<AddFunction>(
-                    _make_shared<MulFunction>(arg0, arg0),
-                    _make_shared<MulFunction>(arg1, arg1))));
+        return make_symbol<SubFunction>(
+            make_symbol<MulFunction>(arg0->diff(v), arg1),
+            make_symbol<DivFunction>(
+                make_symbol<MulFunction>(arg0, arg1->diff(v)),
+                make_symbol<AddFunction>(
+                    make_symbol<MulFunction>(arg0, arg0),
+                    make_symbol<MulFunction>(arg1, arg1))));
     }
 };
 
-Function::shared operator+(const Function::shared &arg0, const Function::shared &arg1) {
-    return _make_shared<AddFunction>(arg0, arg1);
+Symbol operator+(const Symbol &arg0, const Symbol &arg1) {
+    return make_symbol<AddFunction>(arg0, arg1);
 }
 
-Function::shared operator+(const double &arg0, const Function::shared &arg1) {
-    return _make_shared<AddFunction>(_make_shared<Constant>(arg0), arg1);
+Symbol operator+(const double &arg0, const Symbol &arg1) {
+    return make_symbol<AddFunction>(make_symbol<Constant>(arg0), arg1);
 }
 
-Function::shared operator+(const Function::shared &arg0, const double &arg1) {
-    return _make_shared<AddFunction>(arg0, _make_shared<Constant>(arg1));
+Symbol operator+(const Symbol &arg0, const double &arg1) {
+    return make_symbol<AddFunction>(arg0, make_symbol<Constant>(arg1));
 }
 
-Function::shared operator-(const Function::shared &arg0, const Function::shared &arg1) {
-    return _make_shared<SubFunction>(arg0, arg1);
+Symbol operator-(const Symbol &arg0, const Symbol &arg1) {
+    return make_symbol<SubFunction>(arg0, arg1);
 }
 
-Function::shared operator-(const double &arg0, const Function::shared &arg1) {
-    return _make_shared<SubFunction>(_make_shared<Constant>(arg0), arg1);
+Symbol operator-(const double &arg0, const Symbol &arg1) {
+    return make_symbol<SubFunction>(make_symbol<Constant>(arg0), arg1);
 }
 
-Function::shared operator-(const Function::shared &arg0, const double &arg1) {
-    return _make_shared<SubFunction>(arg0, _make_shared<Constant>(arg1));
+Symbol operator-(const Symbol &arg0, const double &arg1) {
+    return make_symbol<SubFunction>(arg0, make_symbol<Constant>(arg1));
 }
 
-Function::shared operator*(const Function::shared &arg0, const Function::shared &arg1) {
-    return _make_shared<MulFunction>(arg0, arg1);
+Symbol operator*(const Symbol &arg0, const Symbol &arg1) {
+    return make_symbol<MulFunction>(arg0, arg1);
 }
 
-Function::shared operator*(const double &arg0, const Function::shared &arg1) {
-    return _make_shared<MulFunction>(_make_shared<Constant>(arg0), arg1);
+Symbol operator*(const double &arg0, const Symbol &arg1) {
+    return make_symbol<MulFunction>(make_symbol<Constant>(arg0), arg1);
 }
 
-Function::shared operator*(const Function::shared &arg0, const double &arg1) {
-    return _make_shared<MulFunction>(arg0, _make_shared<Constant>(arg1));
+Symbol operator*(const Symbol &arg0, const double &arg1) {
+    return make_symbol<MulFunction>(arg0, make_symbol<Constant>(arg1));
 }
 
-Function::shared operator/(const Function::shared &arg0, const Function::shared &arg1) {
-    return _make_shared<DivFunction>(arg0, arg1);
+Symbol operator/(const Symbol &arg0, const Symbol &arg1) {
+    return make_symbol<DivFunction>(arg0, arg1);
 }
 
-Function::shared operator/(const double &arg0, const Function::shared &arg1) {
-    return _make_shared<DivFunction>(_make_shared<Constant>(arg0), arg1);
+Symbol operator/(const double &arg0, const Symbol &arg1) {
+    return make_symbol<DivFunction>(make_symbol<Constant>(arg0), arg1);
 }
 
-Function::shared operator/(const Function::shared &arg0, const double &arg1) {
-    return _make_shared<DivFunction>(arg0, _make_shared<Constant>(arg1));
+Symbol operator/(const Symbol &arg0, const double &arg1) {
+    return make_symbol<DivFunction>(arg0, make_symbol<Constant>(arg1));
 }
 
 }  // namespace sym

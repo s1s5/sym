@@ -25,7 +25,7 @@ enum class IOTag {
 
 class Factory : public FactoryBase {
  public:
-    static void addInput(IOTag tag, const std::string &symbol, const std::vector<std::shared_ptr<Variable>> &inputs_) {
+    static void addInput(IOTag tag, const std::string &symbol, const std::vector<Symbol> &inputs_) {
         switch (tag) {
             case IOTag::STATIC:
                 get()->static_inputs.emplace_back(symbol, inputs_);
@@ -36,7 +36,7 @@ class Factory : public FactoryBase {
         }
     }
 
-    static void addOutput(IOTag tag, const std::string &symbol, std::vector<Function::shared> *outputs_) {
+    static void addOutput(IOTag tag, const std::string &symbol, std::vector<Symbol> *outputs_) {
         switch (tag) {
             case IOTag::STATIC:
                 get()->static_outputs.emplace_back(symbol, outputs_);
@@ -54,7 +54,7 @@ class Factory : public FactoryBase {
 
  public:
     virtual ~Factory() {}
-    Function::shared diff(const Function::shared &func, const Function::shared &var) { return func->diff(var); }
+    Symbol diff(const Symbol &func, const Symbol &var) { return func->diff(var); }
     Digraph digraph() const { return Digraph(rev_repr_map, depends_list, idMapping()); }
     CalculationGraph wholeGraph() const {
         std::unordered_map<int, std::string> input_nodes;
@@ -219,8 +219,8 @@ class Factory : public FactoryBase {
     
 
  protected:
-    std::vector<std::tuple<std::string, std::vector<std::shared_ptr<Variable>>>> static_inputs, dynamic_inputs;
-    std::vector<std::tuple<std::string, std::vector<Function::shared>*>> static_outputs, dynamic_outputs;
+    std::vector<std::tuple<std::string, std::vector<Symbol>>> static_inputs, dynamic_inputs;
+    std::vector<std::tuple<std::string, std::vector<Symbol>*>> static_outputs, dynamic_outputs;
 };
 
 } // namespace sym

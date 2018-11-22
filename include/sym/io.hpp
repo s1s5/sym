@@ -26,33 +26,34 @@ class Input : public Tagged {
  public:
     Input(IOTag tag_, const std::string &symbol_, int num_variables) : Tagged(tag_, symbol_) {
         for (int i = 0; i < num_variables; i++) {
-            v.push_back(_make_shared<Variable>(symbol + "[" + std::to_string(i) + "]"));
+            v.push_back(make_symbol<Variable>(symbol + "[" + std::to_string(i) + "]"));
         }
         Factory::addInput(tag_, symbol, v);
     }
     
-    std::shared_ptr<Variable> operator [](int index) const { return v[index]; }
+    Symbol operator [](int index) const { return v[index]; }
     void assign(const std::vector<double> &values) {
         for (size_t i = 0; i < values.size(); i++) {
-            v[i]->assign(values[i]);
+            auto vi = std::dynamic_pointer_cast<Variable>(v[i]);
+            vi->assign(values[i]);
         }
     }
     // Function::shared operator [](int index) const { return v[index]; }
 
  protected:
-    std::vector<std::shared_ptr<Variable>> v;
+    std::vector<Symbol> v;
 };
 
 class Output : public Tagged {
  public:
-    Output(IOTag tag_, const std::string &symbol_, int num_variables) : Tagged(tag_, symbol_), v(num_variables, nullptr) {
+    Output(IOTag tag_, const std::string &symbol_, int num_variables) : Tagged(tag_, symbol_), v(num_variables) {
         Factory::addOutput(tag_, symbol, &v);
     }
 
-    Function::shared &operator [](int index) { return v[index]; }
+    Symbol &operator [](int index) { return v[index]; }
 
  protected:
-    std::vector<Function::shared> v;
+    std::vector<Symbol> v;
 };
 
 

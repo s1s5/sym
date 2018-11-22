@@ -11,7 +11,7 @@
 #include "sym/sym.hpp"
 
 namespace Eigen {
-template<> struct NumTraits<sym::Function::shared> : NumTraits<int32_t> {
+template<> struct NumTraits<sym::Symbol> : NumTraits<int32_t> {
     enum {
         IsComplex = 0,
         IsInteger = 1,
@@ -36,7 +36,7 @@ struct eigen : public Factory {
 };
 
 TEST_F(eigen, 000) {
-    Eigen::Matrix<S, 2, 2> m0, m1;
+    Eigen::Matrix<Symbol, 2, 2> m0, m1;
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
             m0(i, j) = x0[2 * i + j];
