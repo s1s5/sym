@@ -48,4 +48,9 @@ TEST_F(eigen, 000) {
     std::cout << m0 * m1 << std::endl;
 }
 
+TEST_F(eigen, 001) {
+    Eigen::AngleAxis<Symbol> angle(x0[0], Eigen::Matrix<Symbol, 3, 1>(0, 0, 1));
+    std::cout << angle.toRotationMatrix() << std::endl;
+}
+
 }  // namespace
