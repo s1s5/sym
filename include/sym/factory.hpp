@@ -55,6 +55,16 @@ class Factory : public FactoryBase {
  public:
     virtual ~Factory() {}
     Symbol diff(const Symbol &func, const Symbol &var) { return func->diff(var); }
+    Symbol expand(const Symbol &s) {
+        // TOOD: implement
+        return s;
+    }
+
+    Symbol factor(const Symbol &s) {
+        // TODO: implement
+        return s;
+    }
+
     Digraph digraph() const { return Digraph(rev_repr_map, depends_list, idMapping()); }
     CalculationGraph wholeGraph() const {
         std::unordered_map<int, std::string> input_nodes;
