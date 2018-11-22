@@ -47,6 +47,8 @@ class Function : public std::enable_shared_from_this<Function> {
     int _id;
 };
 
+using S = std::shared_ptr<Function>;
+
 template<class T, class ...Args>
 std::shared_ptr<T> _make_shared(Args... args) {
     std::shared_ptr<T> r = std::make_shared<T>(args...);
@@ -133,6 +135,7 @@ operator<<(std::ostream &os, const T &arg) {
     if (not arg) { return os << std::string("<null>"); }
     return os << arg->repr();
 }
+
 
 // template<class T0, class T1>
 // typename std::enable_if<std::is_base_of<Function, typename T0>::value
