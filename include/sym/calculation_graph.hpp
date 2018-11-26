@@ -37,6 +37,13 @@ class CalculationGraph {
             stack.emplace_back(0, id_mapping[key]);
         }
 
+        std::vector<int> counts(repr_list_.size(), 0);
+        for (auto &&dl : depends_list) {
+            for (auto &&d : dl) {
+                counts[d]++;
+            }
+        }
+
         while (stack.size()) {
             auto [depth, key] = stack.back();
             depths[key] = depth;
@@ -69,6 +76,9 @@ class CalculationGraph {
         std::sort(test_order.begin(), test_order.end());
         for (auto &&[depth, key] : test_order) {
             if (output_nodes.find(key) == output_nodes.end()) {
+                if (counts[key] <= 1) {
+                    continue;
+                }
                 output_order.emplace_back(tvar_type, tvar + std::to_string(key), key);
             } else {
                 output_order.emplace_back("", output_nodes[key], key);
