@@ -208,6 +208,9 @@ class Factory : public FactoryBase {
             if (dynamic_input_nodes.find(i) != dynamic_input_nodes.end()) {
                 continue;
             }
+            if (FactoryBase::is<Constant>(i)) {
+                continue;
+            }
             static_output_nodes[i] = "_i[" + std::to_string(num_intermediates) + "]";
             dynamic_input_nodes[i] = "_i[" + std::to_string(num_intermediates) + "]";
             num_intermediates++;
