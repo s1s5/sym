@@ -68,7 +68,7 @@ class Factory : public FactoryBase {
     Digraph digraph() const { return Digraph(rev_repr_map, depends_list, idMapping()); }
     CalculationGraph wholeGraph() const {
         std::unordered_map<int, std::string> input_nodes;
-        std::unordered_map<int, std::string> output_nodes;
+        std::unordered_map<std::string, int> output_nodes;
         for (auto &&[symbol, vlist] : static_inputs) {
             for (auto &&v : vlist) {
                 input_nodes[v->id()] = rev_repr_map[v->id()](rev_repr_map);
@@ -84,7 +84,7 @@ class Factory : public FactoryBase {
                 if (not ptr_vlist->at(index)) {
                     throw std::runtime_error("output variable is not set");
                 }
-                output_nodes[ptr_vlist->at(index)->id()] = symbol + "[" + std::to_string(index) + "]";
+                output_nodes[symbol + "[" + std::to_string(index) + "]"] = ptr_vlist->at(index)->id();
             }
         }
         for (auto &&[symbol, ptr_vlist] : dynamic_outputs) {
@@ -92,7 +92,7 @@ class Factory : public FactoryBase {
                 if (not ptr_vlist->at(index)) {
                     throw std::runtime_error("output variable is not set");
                 }
-                output_nodes[ptr_vlist->at(index)->id()] = symbol + "[" + std::to_string(index) + "]";
+                output_nodes[symbol + "[" + std::to_string(index) + "]"] = ptr_vlist->at(index)->id();
             }
         }
         return CalculationGraph(input_nodes, output_nodes, rev_repr_map, depends_list, idMapping());
@@ -166,7 +166,7 @@ class Factory : public FactoryBase {
         }
 
         std::unordered_map<int, std::string> static_input_nodes, dynamic_input_nodes;
-        std::unordered_map<int, std::string> static_output_nodes, dynamic_output_nodes;
+        std::unordered_map<std::string, int> static_output_nodes, dynamic_output_nodes;
 
         for (auto &&[symbol, vlist] : static_inputs) {
             for (auto &&v : vlist) {
@@ -185,9 +185,9 @@ class Factory : public FactoryBase {
                 }
                 int id = ptr_vlist->at(index)->id();
                 if (dynamic_nodes[id]) {
-                    dynamic_output_nodes[id] = symbol + "[" + std::to_string(index) + "]";
+                    dynamic_output_nodes[symbol + "[" + std::to_string(index) + "]"] = id;
                 } else {
-                    static_output_nodes[id] = symbol + "[" + std::to_string(index) + "]";
+                    static_output_nodes[symbol + "[" + std::to_string(index) + "]"] = id;
                 }
             }
         }
@@ -196,7 +196,7 @@ class Factory : public FactoryBase {
                 if (not ptr_vlist->at(index)) {
                     throw std::runtime_error("output variable is not set");
                 }
-                dynamic_output_nodes[ptr_vlist->at(index)->id()] = symbol + "[" + std::to_string(index) + "]";
+                dynamic_output_nodes[symbol + "[" + std::to_string(index) + "]"] = ptr_vlist->at(index)->id();
             }
         }
 
@@ -211,7 +211,7 @@ class Factory : public FactoryBase {
             if (FactoryBase::is<Constant>(i)) {
                 continue;
             }
-            static_output_nodes[i] = "_i[" + std::to_string(num_intermediates) + "]";
+            static_output_nodes["_i[" + std::to_string(num_intermediates) + "]"] = i;
             dynamic_input_nodes[i] = "_i[" + std::to_string(num_intermediates) + "]";
             num_intermediates++;
         }
