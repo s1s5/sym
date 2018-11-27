@@ -8,7 +8,6 @@
 #ifndef SYM_EIGEN_HPP_
 #define SYM_EIGEN_HPP_
 
-#include <Eigen/Eigen>
 #include "sym/sym.hpp"
 
 namespace Eigen {
