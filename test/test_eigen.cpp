@@ -23,7 +23,7 @@ struct eigen : public Factory {
 };
 
 TEST_F(eigen, 000) {
-    Matrix2s m0, m1;
+    Matrix2 m0, m1;
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
             m0(i, j) = x0[2 * i + j];
@@ -36,22 +36,22 @@ TEST_F(eigen, 000) {
 
     ASSERT_EQ(m0(0, 0), x0[0]);
 
-    Matrix2s m01 = m0 * m1;
+    Matrix2 m01 = m0 * m1;
     ASSERT_EQ(m01(0, 0), x0[0] * x1[0] + x0[1] * x1[2]);
 }
 
 TEST_F(eigen, 001) {
-    Eigen::AngleAxis<Symbol> angle(x0[0], Eigen::Matrix<Symbol, 3, 1>(0, 0, 1));
+    Eigen::AngleAxis<Symbol> angle(x0[0], Vector3(0, 0, 1));
     // std::cout << "--------------------------------------------------------------------------------" << std::endl;
     // std::cout << angle.toRotationMatrix() << std::endl;
-    Matrix3s r = angle.toRotationMatrix();
+    Matrix3 r = angle.toRotationMatrix();
     ASSERT_EQ(r(0, 0), cos(x0[0]));
     ASSERT_EQ(r(2, 2), 1);
 }
 
 TEST_F(eigen, 002) {
     {
-        Eigen::Map<const Matrix2s> m(x0.data());
+        Eigen::Map<const Matrix2> m(x0.data());
         // std::cout << m << std::endl;
         // col major
         ASSERT_EQ(m(0, 0), x0[0]);

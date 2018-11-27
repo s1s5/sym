@@ -30,14 +30,14 @@ template<> struct NumTraits<sym::Symbol> : NumTraits<int> {
 
 namespace sym {
 
-#define DEF_SYM_SQUARE_MATRIX(N) using Matrix ## N ## s = Eigen::Matrix<Symbol, N, N>
+#define DEF_SYM_SQUARE_MATRIX(N) using Matrix ## N = Eigen::Matrix<Symbol, N, N>
 DEF_SYM_SQUARE_MATRIX(1);
 DEF_SYM_SQUARE_MATRIX(2);
 DEF_SYM_SQUARE_MATRIX(3);
 DEF_SYM_SQUARE_MATRIX(4);
 #undef DEF_SYM_SQUARE_MATRIX
 
-#define DEF_SYM_VECTOR(N) using Vector ## N ## s = Eigen::Matrix<Symbol, N, 1>
+#define DEF_SYM_VECTOR(N) using Vector ## N = Eigen::Matrix<Symbol, N, 1>
 DEF_SYM_VECTOR(1);
 DEF_SYM_VECTOR(2);
 DEF_SYM_VECTOR(3);
