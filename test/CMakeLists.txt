@@ -14,8 +14,6 @@ sym_add_test(four_arithmetic_operations)
 sym_add_test(unary)
 sym_add_test(trigonometric)
 
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-find_package(Eigen)
 if (EIGEN_FOUND)
   #   include_directories(AFTER EIGEN_INCLUDE_DIR)
   sym_add_test(eigen)

@@ -7,6 +7,9 @@ option(SYM_BUILD_UNIT_TEST "enable testing for sym" ON)
 set(CMAKE_CXX_STANDARD 17)
 include_directories(AFTER include)
 
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+find_package(Eigen)
+
 if (SYM_BUILD_EXAMPLE)
   add_subdirectory(example)
 endif()
@@ -15,3 +18,4 @@ if (SYM_BUILD_UNIT_TEST)
   enable_testing()
   add_subdirectory(test)
 endif()
+
