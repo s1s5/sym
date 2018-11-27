@@ -13,6 +13,7 @@
 namespace Eigen {
 template<> struct NumTraits<sym::Symbol> : NumTraits<int> {
     using Real = sym::Symbol;
+    using Nested = sym::Symbol;
     using NonInteger = sym::Symbol;
     using NonNested = sym::Symbol;
     enum {
