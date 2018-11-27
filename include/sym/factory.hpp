@@ -205,7 +205,7 @@ class Factory : public FactoryBase {
             if (not intermediate_nodes[i]) {
                 continue;
             }
-            if (dynamic_input_nodes.find(i) != dynamic_input_nodes.end()) {
+            if (static_input_nodes.find(i) != static_input_nodes.end() or dynamic_input_nodes.find(i) != dynamic_input_nodes.end()) {
                 continue;
             }
             if (FactoryBase::is<Constant>(i)) {

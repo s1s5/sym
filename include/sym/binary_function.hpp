@@ -17,11 +17,10 @@ namespace sym {
 class BinaryFunction : public Function {
  public:
     BinaryFunction(const std::string &operator_, const Symbol &arg0_, const Symbol &arg1_)
-        : Function(_repr("(", arg0_->id(), operator_, arg1_->id(), ")"),
-                   FactoryBase::depends(arg0_->id(), arg1_->id())),
+        : Function(_repr("(", arg0_->id(), operator_, arg1_->id(), ")"), {arg0_->id(), arg1_->id()}),
           arg0(arg0_),
           arg1(arg1_) {}
-
+                   
  protected:
     Symbol arg0, arg1;
 };

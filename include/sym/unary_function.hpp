@@ -17,7 +17,7 @@ namespace sym {
 class UnaryFunction : public Function {
  public:
     UnaryFunction(const std::string &operator_, const Symbol &arg_)
-        : Function(_repr("(", operator_, "(", arg_->id(), "))"), FactoryBase::depends(arg_->id())), arg(arg_) {}
+        : Function(_repr("(", operator_, "(", arg_->id(), "))"), {arg_->id()}), arg(arg_) {}
 
  protected:
     Symbol arg;

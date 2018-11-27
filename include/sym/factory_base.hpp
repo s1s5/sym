@@ -108,6 +108,11 @@ class FactoryBase {
 
     int _add(const Repr &repr_obj, const std::unordered_set<int> &depends, std::shared_ptr<Function> f) {
         std::string repr = repr_obj(rev_repr_map);
+        // std::cout << repr << " : ";
+        // for (auto &&d : depends) {
+        //     std::cout << FactoryBase::repr(d) << ", ";
+        // }
+        // std::cout << std::endl;
         auto iter = repr_map.find(repr);
         if (iter == repr_map.end()) {
             int index = repr_map.size();

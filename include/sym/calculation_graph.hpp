@@ -51,14 +51,15 @@ class CalculationGraph {
 
             stack.pop_back();
 
-            if (input_nodes.find(key) != input_nodes.end()) {
-                continue;
-            }
-
             depth += 1;
             for (auto &&dkey_ : depends_list[key]) {
                 int dkey = id_mapping[dkey_];
+                // std::cout << key << "(" << FactoryBase::repr(key) << ")" << " -> " << dkey << "(" << FactoryBase::repr(dkey) << ")" << std::endl;
                 if (depths[dkey] >= depth) {
+                    continue;
+                }
+
+                if (input_nodes.find(dkey) != input_nodes.end()) {
                     continue;
                 }
                 stack.emplace_back(depth, dkey);
@@ -66,6 +67,7 @@ class CalculationGraph {
         }
         std::vector<std::tuple<int, int>> test_order;
         for (size_t i = 0; i < depths.size(); i++) {
+            // std::cout << FactoryBase::repr(i) << ", key=" << i << ", depth=" << depths[i] << std::endl;
             if (depths[i] == -1) {
                 continue;
             }
@@ -77,6 +79,9 @@ class CalculationGraph {
         }
         std::sort(test_order.begin(), test_order.end());
         for (auto &&[depth, key] : test_order) {
+            if (FactoryBase::is<Constant>(key)) {
+                continue;
+            }
             // std::cout << "key=" << key << ", depth=" << depth << std::endl;
             // if (output_nodes.find(key) == output_nodes.end()) {
                 // if (counts[key] <= 1) {
