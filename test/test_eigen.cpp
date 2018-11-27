@@ -7,6 +7,8 @@
  */
 #include "cpput.hpp"
 
+#include <Eigen/Eigen>
+
 #include "sym/sym.hpp"
 #include "sym/sym_eigen.hpp"
 

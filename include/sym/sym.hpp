@@ -21,6 +21,7 @@
 #include "binary_function_impl.hpp"
 
 #include <iostream>
+#include <fstream>
 
 namespace sym {
 
@@ -29,7 +30,7 @@ int default_main(int argc, char **argv) {
     F factory;
 
     bool test_mode = false, dag_mode = false;
-    std::string function_name, ns_name, class_name;
+    std::string function_name, ns_name, class_name, output_name = "-";
     for (int arg = 1; arg < argc; arg++) {
         auto check_arg = [&](char short_opt, const std::string &long_opt, bool increment_arg) {
             if (std::string(argv[arg]) == std::string("-") + std::string({short_opt}) or
@@ -47,6 +48,8 @@ int default_main(int argc, char **argv) {
             ns_name = argv[arg];
         } else if (check_arg('c', "class", true)) {
             class_name = argv[arg];
+        } else if (check_arg('o', "output", true)) {
+            output_name = argv[arg];
         } else if (check_arg('\0', "test", false)) {
             test_mode = true;
         } else if (check_arg('\0', "dag", false)) {
@@ -59,9 +62,20 @@ int default_main(int argc, char **argv) {
     if (test_mode) {
         
     } else if (dag_mode) {
-        std::cout << factory.digraph() << std::endl;
+        if (output_name == "-") {
+            std::cout << factory.digraph() << std::endl;
+        } else {
+            std::ofstream ofs(output_name);
+            ofs << factory.digraph() << std::endl;
+        }
     } else if (class_name != "") {
-        std::cout << factory.cxxCodePrinter(ns_name, class_name) << std::endl;
+        if (output_name == "-") {
+            std::cout << factory.cxxCodePrinter(ns_name, class_name) << std::endl;
+        } else {
+            std::ofstream ofs(output_name);
+            ofs << "#pragma once" << std::endl;
+            ofs << factory.cxxCodePrinter(ns_name, class_name) << std::endl;
+        }
     } else if (function_name != "") {
         
     } else {
