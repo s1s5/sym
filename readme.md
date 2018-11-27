@@ -103,3 +103,9 @@ std::cout << y[0] << ", " << y[1] << std::endl;
 - [ ] optimize calculation graph
 - [ ] multiple generator single source
 - [ ] generic test
+- [ ] add const for input variables
+- [ ] bug fix eigen intermediate/laxy expression(auto x = y * z; cout << x << endl;), add test
+- [ ] support neon
+- [ ] more fine grained template class
+- [ ] share intermediates in multiple generator
+- [ ] more eigen aliases(AngleAxis ...)
