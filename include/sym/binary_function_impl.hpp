@@ -21,14 +21,17 @@ inline void AddFunction::simplified() const  {
         FactoryBase::setAliasRepr(id(), arg1->id());
     } else if (is_zero(arg1)) {
         FactoryBase::setAliasRepr(id(), arg0->id());
-    }
-
-    ASExtractor ex;
-    ex.addAdd(arg0);
-    ex.addAdd(arg1);
-    if (ex.camBeSimplified()) {
-        auto a = ex.simplified();
+    } else if (is_constant(arg0) and is_constant(arg1)) {
+        Symbol a(arg0->eval() + arg1->eval());
         FactoryBase::setAliasRepr(id(), a->id());
+    } else {
+        ASExtractor ex;
+        ex.addAdd(arg0);
+        ex.addAdd(arg1);
+        if (ex.camBeSimplified()) {
+            auto a = ex.simplified();
+            FactoryBase::setAliasRepr(id(), a->id());
+        }
     }
 }
 
@@ -40,14 +43,17 @@ inline void SubFunction::simplified() const {
         FactoryBase::setAliasRepr(id(), a->id());
     } else if (is_zero(arg1)) {
         FactoryBase::setAliasRepr(id(), arg0->id());
-    }
-
-    ASExtractor ex;
-    ex.addAdd(arg0);
-    ex.addSub(arg1);
-    if (ex.camBeSimplified()) {
-        auto a = ex.simplified();
+    } else if (is_constant(arg0) and is_constant(arg1)) {
+        Symbol a(arg0->eval() - arg1->eval());
         FactoryBase::setAliasRepr(id(), a->id());
+    } else {
+        ASExtractor ex;
+        ex.addAdd(arg0);
+        ex.addSub(arg1);
+        if (ex.camBeSimplified()) {
+            auto a = ex.simplified();
+            FactoryBase::setAliasRepr(id(), a->id());
+        }
     }
 }
 
@@ -60,6 +66,9 @@ inline void MulFunction::simplified() const  {
         FactoryBase::setAliasRepr(id(), arg1->id());
     } else if (is_one(arg1)) {
         FactoryBase::setAliasRepr(id(), arg0->id());
+    } else if (is_constant(arg0) and is_constant(arg1)) {
+        Symbol a(arg0->eval() * arg1->eval());
+        FactoryBase::setAliasRepr(id(), a->id());
     } else if (is_negative_one(arg0)) {
         auto a = make_symbol<NegFunction>(arg1);
         FactoryBase::setAliasRepr(id(), a->id());
