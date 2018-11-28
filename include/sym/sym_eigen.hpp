@@ -44,6 +44,9 @@ DEF_SYM_VECTOR(3);
 DEF_SYM_VECTOR(4);
 #undef DEF_SYM_VECTOR
 
+using AngleAxis = Eigen::AngleAxis<Symbol>;
+using Isometry3 = Eigen::Transform<Symbol, 3, Eigen::Isometry>;
+
 template<int R, int C, int Major = Eigen::ColMajor>
 Eigen::Map<const Eigen::Matrix<Symbol, R, C, Major>> asMatrix(const Input &input) {
     if (R * C > input.size()) {
