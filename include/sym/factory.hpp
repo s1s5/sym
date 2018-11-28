@@ -29,9 +29,11 @@ class Factory : public FactoryBase {
         switch (tag) {
             case IOTag::STATIC:
                 get()->static_inputs.emplace_back(symbol, inputs_);
+                get()->static_variables.push_back(symbol);
                 break;
             case IOTag::DYNAMIC:
                 get()->dynamic_inputs.emplace_back(symbol, inputs_);
+                get()->dynamic_variables.push_back(symbol);
                 break;
         }
     }
@@ -40,9 +42,11 @@ class Factory : public FactoryBase {
         switch (tag) {
             case IOTag::STATIC:
                 get()->static_outputs.emplace_back(symbol, outputs_);
+                get()->static_variables.push_back(symbol);
                 break;
             case IOTag::DYNAMIC:
                 get()->dynamic_outputs.emplace_back(symbol, outputs_);
+                get()->dynamic_variables.push_back(symbol);
                 break;
         }
     }
@@ -119,19 +123,19 @@ class Factory : public FactoryBase {
 
     CxxCodePrinter cxxCodePrinter(const std::string &ns, const std::string &class_name) {
         CxxCodePrinter printer(ns, class_name);
-        std::vector<std::string> static_variables, dynamic_variables;
-        for (auto &&[symbol, vlist] : static_inputs) {
-            static_variables.push_back(symbol);
-        }
-        for (auto &&[symbol, vlist] : dynamic_inputs) {
-            dynamic_variables.push_back(symbol);
-        }
-        for (auto &&[symbol, vlist] : static_outputs) {
-            static_variables.push_back(symbol);
-        }
-        for (auto &&[symbol, vlist] : dynamic_outputs) {
-            dynamic_variables.push_back(symbol);
-        }
+        // std::vector<std::string> static_variables, dynamic_variables;
+        // for (auto &&[symbol, vlist] : static_inputs) {
+        //     static_variables.push_back(symbol);
+        // }
+        // for (auto &&[symbol, vlist] : dynamic_inputs) {
+        //     dynamic_variables.push_back(symbol);
+        // }
+        // for (auto &&[symbol, vlist] : static_outputs) {
+        //     static_variables.push_back(symbol);
+        // }
+        // for (auto &&[symbol, vlist] : dynamic_outputs) {
+        //     dynamic_variables.push_back(symbol);
+        // }
 
         std::vector<bool> dynamic_nodes(repr_map.size(), false);
         std::vector<bool> intermediate_nodes(repr_map.size(), false);
@@ -229,11 +233,9 @@ class Factory : public FactoryBase {
     }
 
  protected:
-    
-
- protected:
     std::vector<std::tuple<std::string, std::vector<Symbol>>> static_inputs, dynamic_inputs;
     std::vector<std::tuple<std::string, std::vector<Symbol>*>> static_outputs, dynamic_outputs;
+    std::vector<std::string> static_variables, dynamic_variables;
 };
 
 } // namespace sym
