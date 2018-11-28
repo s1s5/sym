@@ -18,7 +18,7 @@ template<> struct NumTraits<sym::Symbol> : NumTraits<int> {
     using NonNested = sym::Symbol;
     enum {
         IsComplex = 0,
-        IsInteger = 1,
+        IsInteger = 0,
         IsSigned = 1,
         RequireInitialization = 1,
         ReadCost = 1,
@@ -26,6 +26,17 @@ template<> struct NumTraits<sym::Symbol> : NumTraits<int> {
         MulCost = 3
     };
 };
+namespace internal {
+
+template<>
+struct significant_decimals_default_impl<sym::Symbol, false>
+{
+  static inline int run()
+  {
+    return 0;
+  }
+};
+}  // namespace internal
 }  // namespace Eigen
 
 namespace sym {
