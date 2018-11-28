@@ -63,7 +63,7 @@ class MulFunction : public BinaryFunction {
  protected:
     virtual Symbol _diff(Symbol v) const override {
         return make_symbol<AddFunction>(make_symbol<MulFunction>(arg0->diff(v), arg1),
-                                             make_symbol<MulFunction>(arg0, arg1->diff(v)));
+                                        make_symbol<MulFunction>(arg0, arg1->diff(v)));
     }
 };
 
@@ -91,8 +91,8 @@ class DivFunction : public BinaryFunction {
         }
         return make_symbol<SubFunction>(
             make_symbol<DivFunction>(d0, arg1),
-            make_symbol<DivFunction>(make_symbol<DivFunction>(arg0, d1),
-                                      make_symbol<MulFunction>(arg1, arg1)));
+            make_symbol<DivFunction>(make_symbol<MulFunction>(arg0, d1),
+                                     make_symbol<MulFunction>(arg1, arg1)));
     }
 };
 
