@@ -33,7 +33,6 @@ class NegFunction : public UnaryFunction {
     virtual Symbol _diff(Symbol v) const override {
         return make_symbol<NegFunction>(arg->diff(v));
     }
-
     friend class ASExtractor;
 };
 

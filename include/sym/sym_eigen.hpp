@@ -29,7 +29,8 @@ template<> struct NumTraits<sym::Symbol> : NumTraits<int> {
 namespace internal {
 
 template<>
-struct significant_decimals_default_impl<sym::Symbol, false>
+// struct significant_decimals_default_impl<sym::Symbol, false>
+struct significant_decimals_impl<sym::Symbol>
 {
   static inline int run()
   {

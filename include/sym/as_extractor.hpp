@@ -28,6 +28,8 @@ class ASExtractor {
         } else if (s->is<NegFunction>()) {
             std::shared_ptr<NegFunction> p = s->ptr<NegFunction>();
             addSub(p->arg);
+        } else if (s->is<Constant>()) {
+            constants.push_back(s);
         } else {
             positives.push_back(s);
         }
@@ -45,6 +47,8 @@ class ASExtractor {
         } else if (s->is<NegFunction>()) {
             std::shared_ptr<NegFunction> p = s->ptr<NegFunction>();
             addAdd(p->arg);
+        } else if (s->is<Constant>()) {
+            negative_constants.push_back(s);
         } else {
             negatives.push_back(s);
         }
@@ -58,12 +62,19 @@ class ASExtractor {
                 }
             }
         }
-        return false;
+        return (constants.size() + negative_constants.size()) > 1;
     }
 
     Symbol simplified() const {
-        Symbol s(0);
         std::vector<bool> used(negatives.size(), false);
+        double v = 0;
+        for (auto &&c : constants) {
+            v += c.eval();
+        }
+        for (auto &&c : negative_constants) {
+            v -= c.eval();
+        }
+        Symbol s(v);
         for (auto &&p : positives) {
             bool found = false;
             for (size_t i = 0; i < negatives.size(); i++) {
@@ -91,6 +102,7 @@ class ASExtractor {
     }
 
     std::vector<Symbol> positives, negatives;
+    std::vector<Symbol> constants, negative_constants;
 };
 
 }  // namespace sym
