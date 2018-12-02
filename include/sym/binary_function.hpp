@@ -54,6 +54,7 @@ class SubFunction : public BinaryFunction {
     friend class ASExtractor;
 };
 
+class MDExtractor;
 class MulFunction : public BinaryFunction {
  public:
     MulFunction(const Symbol &arg0, const Symbol &arg1) : BinaryFunction("*", arg0, arg1) {}
@@ -65,6 +66,7 @@ class MulFunction : public BinaryFunction {
         return make_symbol<AddFunction>(make_symbol<MulFunction>(arg0->diff(v), arg1),
                                         make_symbol<MulFunction>(arg0, arg1->diff(v)));
     }
+    friend class MDExtractor;
 };
 
 class DivFunction : public BinaryFunction {
@@ -84,6 +86,7 @@ class DivFunction : public BinaryFunction {
             make_symbol<MulFunction>(negative_one(), d1),
             make_symbol<DivFunction>(make_symbol<MulFunction>(arg1, arg1)));
     }
+    friend class MDExtractor;
 };
 
 class Atan2Function : public BinaryFunction {

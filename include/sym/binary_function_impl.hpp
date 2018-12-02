@@ -11,6 +11,7 @@
 #include "binary_function.hpp"
 #include "unary_function.hpp"
 #include "as_extractor.hpp"
+#include "md_extractor.hpp"
 
 namespace sym {
 
@@ -79,6 +80,20 @@ inline void MulFunction::simplified() const  {
     } else if (is_negative_one(arg0)) {
         auto a = make_symbol<NegFunction>(arg0);
         FactoryBase::setAliasRepr(id(), a->id());
+    } else if (is_constant(arg0) and is_constant(arg1)) {
+        auto a = make_symbol<Constant>(arg0.eval() * arg1.eval());
+        FactoryBase::setAliasRepr(id(), a->id());
+    } else if (is_constant(arg1)) {
+        auto a = make_symbol<MulFunction>(arg1, arg0);
+        FactoryBase::setAliasRepr(id(), a->id());
+    } else {
+        MDExtractor mx;
+        mx.addMul(arg0);
+        mx.addMul(arg1);
+        if (mx.canBeSimplified()) {
+            auto a = mx.simplified();
+            FactoryBase::setAliasRepr(id(), a->id());
+        }
     }
 }
 
@@ -89,6 +104,13 @@ void DivFunction::simplified() const  {
         FactoryBase::setAliasRepr(id(), arg0->id()); 
     } else if (is_one(arg1)) {
         FactoryBase::setAliasRepr(id(), arg0->id());
+    } else {
+        MDExtractor mx;
+        mx.addDiv(arg1);
+        if (mx.canBeSimplified()) {
+            auto a = mx.simplified();
+            FactoryBase::setAliasRepr(id(), a->id());
+        }
     }
 }
 

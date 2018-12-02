@@ -34,6 +34,10 @@ class Function : public std::enable_shared_from_this<Function> {
         Symbol & operator -= (const double &v);
         Symbol & operator += (const Symbol &v);
         Symbol & operator -= (const Symbol &v);
+        Symbol & operator *= (const double &v);
+        Symbol & operator /= (const double &v);
+        Symbol & operator *= (const Symbol &v);
+        Symbol & operator /= (const Symbol &v);
         
         bool operator == (const Symbol &rhs) const {
             return get()->id() == rhs->id();

@@ -24,6 +24,7 @@ class UnaryFunction : public Function {
 };
 
 class ASExtractor;
+class MDExtractor;
 class NegFunction : public UnaryFunction {
  public:
     NegFunction(const Symbol &arg_) : UnaryFunction("-", arg_) {}
@@ -34,6 +35,7 @@ class NegFunction : public UnaryFunction {
         return make_symbol<NegFunction>(arg->diff(v));
     }
     friend class ASExtractor;
+    friend class MDExtractor;
 };
 
 class SinFunction : public UnaryFunction {

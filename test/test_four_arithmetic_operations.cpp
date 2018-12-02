@@ -35,10 +35,10 @@ TEST_F(four_arithmetic_operations, add_diff) {
 
 TEST_F(four_arithmetic_operations, add_simplified) {
     y[0] = (x[0] + 1);
-    std::cout << y[0].repr() << std::endl;
+    // std::cout << y[0].repr() << std::endl;
     ASSERT_EQ(y[0].repr(), "(1.000000+x[0])");
     y[0] = (x[0] + 1) + (x[1] + 1);
-    std::cout << y[0] << std::endl;
+    ASSERT_EQ(y[0].repr(), "((2.000000+x[0])+x[1])");
 }
 
 TEST_F(four_arithmetic_operations, sub_eval) {
@@ -71,6 +71,17 @@ TEST_F(four_arithmetic_operations, mul_diff) {
     ASSERT_EQ(diff(y[0], x[1]), x[0]);
     ASSERT_EQ(diff(y[0], x[2]), zero());
     ASSERT_EQ(diff(y[1], x[0]), (x[0] + x[0]));
+}
+
+TEST_F(four_arithmetic_operations, mul_simplified) {
+    y[0] = 1 * x[0];
+    ASSERT_EQ(y[0].repr(), "x[0]");
+    y[0] = 1 * x[0] * 3;
+    ASSERT_EQ(y[0].repr(), "(3.000000*x[0])");
+    y[0] = 2 * x[0] * 2;
+    ASSERT_EQ(y[0].repr(), "(4.000000*x[0])");
+    // y[0] = 2 * x[0] * 2 * x[0];
+    // std::cout << y[0].repr() << std::endl;
 }
 
 TEST_F(four_arithmetic_operations, div_eval) {
