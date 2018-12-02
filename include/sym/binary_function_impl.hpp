@@ -31,7 +31,7 @@ inline void AddFunction::simplified() const  {
         ASExtractor ex;
         ex.addAdd(arg0);
         ex.addAdd(arg1);
-        if (ex.camBeSimplified()) {
+        if (ex.canBeSimplified()) {
             auto a = ex.simplified();
             FactoryBase::setAliasRepr(id(), a->id());
         }
@@ -57,7 +57,7 @@ inline void SubFunction::simplified() const {
         ASExtractor ex;
         ex.addAdd(arg0);
         ex.addSub(arg1);
-        if (ex.camBeSimplified()) {
+        if (ex.canBeSimplified()) {
             auto a = ex.simplified();
             FactoryBase::setAliasRepr(id(), a->id());
         }

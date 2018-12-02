@@ -24,7 +24,7 @@ inline void NegFunction::simplified() const {
     }
     ASExtractor ex;
     ex.addSub(arg);
-    if (ex.camBeSimplified()) {
+    if (ex.canBeSimplified()) {
         auto a = ex.simplified();
         FactoryBase::setAliasRepr(id(), a->id());
     }

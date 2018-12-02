@@ -54,7 +54,7 @@ class ASExtractor {
         }
     }
 
-    bool camBeSimplified() const {
+    bool canBeSimplified() const {
         for (auto &&p : positives) {
             for (auto &&n : negatives) {
                 if (p == n) {
