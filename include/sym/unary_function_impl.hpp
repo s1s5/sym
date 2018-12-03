@@ -24,7 +24,7 @@ inline void NegFunction::simplified() const {
     }
     ASExtractor ex;
     ex.addSub(arg);
-    if (ex.camBeSimplified()) {
+    if (ex.canBeSimplified()) {
         auto a = ex.simplified();
         FactoryBase::setAliasRepr(id(), a->id());
     }
@@ -43,11 +43,11 @@ inline Symbol CosFunction::_diff(Symbol v) const {
 }
 
 inline Symbol SquareRootFunction::_diff(Symbol v) const {
-    return make_symbol<DivFunction>(
-        arg->diff(v), 
-        make_symbol<MulFunction>(
-            make_symbol<Constant>(2),
-            make_symbol<SquareRootFunction>(arg)));
+    return make_symbol<MulFunction>(arg->diff(v), 
+                                    make_symbol<DivFunction>(
+                                        make_symbol<MulFunction>(
+                                            make_symbol<Constant>(2),
+                                            make_symbol<SquareRootFunction>(arg))));
 }
 
 inline Symbol ExpFunction::_diff(Symbol v) const {
@@ -55,16 +55,17 @@ inline Symbol ExpFunction::_diff(Symbol v) const {
 }
 
 inline Symbol LogFunction::_diff(Symbol v) const {
-    return make_symbol<DivFunction>(arg->diff(v), arg);
+    return make_symbol<MulFunction>(arg->diff(v),
+                                    make_symbol<DivFunction>(arg));
 }
 
 inline Symbol ArcSinFunction::_diff(Symbol v) const {
-    return make_symbol<DivFunction>(
-        arg->diff(v),
-        make_symbol<SquareRootFunction>(
-            make_symbol<SubFunction>(
-                make_symbol<Constant>(1),
-                make_symbol<MulFunction>(arg, arg))));
+    return make_symbol<MulFunction>(arg->diff(v),
+                                    make_symbol<DivFunction>(
+                                        make_symbol<SquareRootFunction>(
+                                            make_symbol<SubFunction>(
+                                                make_symbol<Constant>(1),
+                                                make_symbol<MulFunction>(arg, arg)))));
 }
 
 }  // namespace sym

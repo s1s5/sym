@@ -34,6 +34,10 @@ class Function : public std::enable_shared_from_this<Function> {
         Symbol & operator -= (const double &v);
         Symbol & operator += (const Symbol &v);
         Symbol & operator -= (const Symbol &v);
+        Symbol & operator *= (const double &v);
+        Symbol & operator /= (const double &v);
+        Symbol & operator *= (const Symbol &v);
+        Symbol & operator /= (const Symbol &v);
         
         bool operator == (const Symbol &rhs) const {
             return get()->id() == rhs->id();
@@ -42,6 +46,9 @@ class Function : public std::enable_shared_from_this<Function> {
         bool operator != (const Symbol &rhs) const {
             return not (operator == (rhs));
         }
+
+        std::string repr() const { return get()->repr(); }
+        double eval() const { return get()->eval(); }
     };
     
  public:
@@ -138,7 +145,7 @@ inline Symbol one() {
 }
 
 inline Symbol negative_one() {
-    return make_symbol<Constant>(1);
+    return make_symbol<Constant>(-1);
 }
 
 class Variable : public Function {

@@ -29,6 +29,21 @@ inline Function::Symbol & Function::Symbol::operator -= (const Symbol &v) {
     return *this = (*this) - v;
 }
 
+inline Function::Symbol & Function::Symbol::operator *= (const double &v) {
+    return *this = (*this) * v;
+}
+
+inline Function::Symbol & Function::Symbol::operator /= (const double &v) {
+    return *this = (*this) / v;
+}
+
+inline Function::Symbol & Function::Symbol::operator *= (const Symbol &v) {
+    return *this = (*this) * v;
+}
+
+inline Function::Symbol & Function::Symbol::operator /= (const Symbol &v) {
+    return *this = (*this) / v;
+}
 
 }  // namespace sym
 

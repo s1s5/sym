@@ -109,3 +109,4 @@ std::cout << y[0] << ", " << y[1] << std::endl;
 - [ ] more fine grained template class
 - [ ] share intermediates in multiple generator
 - [ ] more eigen aliases(AngleAxis ...)
+- [ ] implement subs
