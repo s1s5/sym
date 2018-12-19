@@ -74,6 +74,9 @@ inline void MulFunction::simplified() const  {
         FactoryBase::setAliasRepr(id(), arg1->id());
     } else if (is_one(arg1)) {
         FactoryBase::setAliasRepr(id(), arg0->id());
+    } else if (is_constant(arg0) and is_constant(arg1)) {
+        Symbol a(arg0->eval() * arg1->eval());
+        FactoryBase::setAliasRepr(id(), a->id());
     } else if (is_negative_one(arg0)) {
         auto a = make_symbol<NegFunction>(arg1);
         FactoryBase::setAliasRepr(id(), a->id());
