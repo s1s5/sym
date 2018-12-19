@@ -68,6 +68,16 @@ inline Symbol ArcSinFunction::_diff(Symbol v) const {
                                                 make_symbol<MulFunction>(arg, arg)))));
 }
 
+inline Symbol ArcCosFunction::_diff(Symbol v) const {
+    return make_symbol<NegFunction>(
+        make_symbol<MulFunction>(arg->diff(v),
+                                 make_symbol<DivFunction>(
+                                     make_symbol<SquareRootFunction>(
+                                         make_symbol<SubFunction>(
+                                             make_symbol<Constant>(1),
+                                             make_symbol<MulFunction>(arg, arg))))));
+}
+
 }  // namespace sym
 
 #endif  // UNARY_FUNCTION_IMPL_HPP_

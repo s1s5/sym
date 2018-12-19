@@ -128,6 +128,21 @@ class ArcSinFunction : public UnaryFunction {
     virtual Symbol _diff(Symbol v) const override;
 };
 
+class ArcCosFunction : public UnaryFunction {
+ public:
+    ArcCosFunction(const Symbol &arg_) : UnaryFunction("acos", arg_) {}
+    virtual void simplified() const override {
+        arg->simplified();
+        if (is_constant(arg)) {
+            auto a = make_symbol<Constant>(std::acos(arg->eval()));
+            FactoryBase::setAliasRepr(id(), a->id());
+        }
+    }
+    virtual double eval() const override { return std::acos(arg->eval()); }
+ protected:
+    virtual Symbol _diff(Symbol v) const override;
+};
+
 inline Symbol operator -(const Symbol &arg) {
     return make_symbol<NegFunction>(arg);
 }
@@ -142,6 +157,10 @@ inline Symbol cos(const Symbol &arg) {
 
 inline Symbol asin(const Symbol &arg) {
     return make_symbol<ArcSinFunction>(arg);
+}
+
+inline Symbol acos(const Symbol &arg) {
+    return make_symbol<ArcCosFunction>(arg);
 }
 
 inline Symbol sqrt(const Symbol &arg) {
