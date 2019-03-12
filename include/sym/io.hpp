@@ -32,7 +32,7 @@ class Input : public Tagged {
     }
     size_t size() const { return v.size(); }
     const Symbol *data() const { return v.data(); }
-    Symbol operator [](int index) const { return v[index]; }
+    Symbol operator ()(int index) const { return v[index]; }
     void assign(const std::vector<double> &values) {
         for (size_t i = 0; i < values.size(); i++) {
             auto vi = std::dynamic_pointer_cast<Variable>(v[i]);
@@ -54,7 +54,8 @@ class Output : public Tagged {
     size_t size() const { return v.size(); }
     Symbol *data() { return v.data(); }
     const Symbol *data() const { return v.data(); }
-    Symbol &operator [](int index) { return v[index]; }
+    Symbol &operator ()(int index) { return v[index]; }
+    const Symbol &operator ()(int index) const { return v[index]; }
 
  protected:
     std::vector<Symbol> v;
