@@ -24,29 +24,35 @@ class CxxCodePrinter {
                 return os;
             }
             std::string line_prefix = "    ";
-            os << line_prefix << f.type << (f.type == "" ? "" : " ") << f.name << "(" << f.args << ") "
-               << (f.initials == "" ? "" : ": ") << f.initials << (f.initials == "" ? "" : " ") << "{" << std::endl;
+            os << line_prefix << f.type << (f.type == "" ? "" : " ") << f.name;
+            os << "(" << f.args << ") "
+               << (f.initials == "" ? "" : ": ") << f.initials << (f.initials == "" ? "" : " ");
+            if (f.is_const) {
+                os << "const ";
+            }
+            os << "{" << std::endl;
             os << f.contents;
             os << line_prefix << "}" << std::endl;
             return os;
         }
      
         std::string type, name, args, contents, initials;
+        bool is_const{false};
     };
 
  public:
     CxxCodePrinter(const std::string &ns_, const std::string &class_name_) : ns(ns_), class_name(class_name_), function_list(2) {
     }
 
-    void setStaticVariables(const std::vector<std::string> &variables, int num_intermediates, const std::string &refresh_contents) {
+    void setStaticVariables(const std::vector<std::tuple<bool, std::string>> &variables, int num_intermediates, const std::string &refresh_contents) {
         constructor.name = class_name;
         constructor.args = "";
         constructor.initials = "";
         members.clear();
-        for (auto &&s : variables) {
-            constructor.args += std::string(constructor.args == "" ? "" : ", ") + std::string("ProbeScalar *" + s + "_");
+        for (auto &&[is_const, s] : variables) {
+            constructor.args += std::string(constructor.args == "" ? "" : ", ") + std::string((is_const ? "const " : "") + std::string("ProbeScalar *") + s + "_");
             constructor.initials += (constructor.initials == "" ? "" : ", ") + s + "(" + s + "_)";
-            members.push_back("ProbeScalar *" + s);
+            members.push_back((is_const ? "const " : "") + std::string("ProbeScalar *") + s);
         }
         if (num_intermediates > 0) {
             members.push_back("IntermediateScalar _i[" + std::to_string(num_intermediates) + "]");
@@ -60,13 +66,14 @@ class CxxCodePrinter {
         f.contents = refresh_contents;
     }
 
-    void setDynamicVariables(const std::vector<std::string> &variables, const std::string &contents) {
+    void setDynamicVariables(const std::vector<std::tuple<bool, std::string>> &variables, const std::string &contents) {
         auto &f = function_list[1];
         f.type = "void";
         f.name = "operator()";
         f.args = "";
-        for (auto &&s : variables) {
-            f.args += std::string(f.args == "" ? "" : ", ") + std::string("ProbeScalar *" + s);
+        f.is_const = true;
+        for (auto &&[is_const, s] : variables) {
+            f.args += std::string(f.args == "" ? "" : ", ") + std::string((is_const ? "const " : "") + std::string("ProbeScalar *") + s);
         }
         f.contents = contents;
     }

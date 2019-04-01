@@ -29,11 +29,11 @@ class Factory : public FactoryBase {
         switch (tag) {
             case IOTag::STATIC:
                 get()->static_inputs.emplace_back(symbol, inputs_);
-                get()->static_variables.push_back(symbol);
+                get()->static_variables.emplace_back(true, symbol);
                 break;
             case IOTag::DYNAMIC:
                 get()->dynamic_inputs.emplace_back(symbol, inputs_);
-                get()->dynamic_variables.push_back(symbol);
+                get()->dynamic_variables.emplace_back(true, symbol);
                 break;
         }
     }
@@ -42,11 +42,11 @@ class Factory : public FactoryBase {
         switch (tag) {
             case IOTag::STATIC:
                 get()->static_outputs.emplace_back(symbol, outputs_);
-                get()->static_variables.push_back(symbol);
+                get()->static_variables.emplace_back(false, symbol);
                 break;
             case IOTag::DYNAMIC:
                 get()->dynamic_outputs.emplace_back(symbol, outputs_);
-                get()->dynamic_variables.push_back(symbol);
+                get()->dynamic_variables.emplace_back(false, symbol);
                 break;
         }
     }
@@ -235,7 +235,7 @@ class Factory : public FactoryBase {
  protected:
     std::vector<std::tuple<std::string, std::vector<Symbol>>> static_inputs, dynamic_inputs;
     std::vector<std::tuple<std::string, std::vector<Symbol>*>> static_outputs, dynamic_outputs;
-    std::vector<std::string> static_variables, dynamic_variables;
+    std::vector<std::tuple<bool, std::string>> static_variables, dynamic_variables;
 };
 
 } // namespace sym
