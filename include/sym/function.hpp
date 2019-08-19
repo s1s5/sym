@@ -49,11 +49,13 @@ class Function : public std::enable_shared_from_this<Function> {
         }
 
         bool operator <(const Symbol& rhs) const {
-            return operator->()->id() < rhs->id();
+            return get()->id() < rhs->id();
         }
 
         std::string repr() const { return get()->repr(); }
         double eval() const { return get()->eval(); }
+        Symbol diff(Symbol v) const { return get()->diff(v); }
+        Symbol subs(const std::map<Symbol, Symbol> &m) const { return get()->subs(m); }
     };
     
  public:
