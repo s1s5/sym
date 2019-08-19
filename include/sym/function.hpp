@@ -8,6 +8,7 @@
 #ifndef FUNCTION_HPP_
 #define FUNCTION_HPP_
 
+#include <map>
 #include "factory_base.hpp"
 
 namespace sym {
@@ -47,6 +48,10 @@ class Function : public std::enable_shared_from_this<Function> {
             return not (operator == (rhs));
         }
 
+        bool operator <(const Symbol& rhs) const {
+            return operator->()->id() < rhs->id();
+        }
+
         std::string repr() const { return get()->repr(); }
         double eval() const { return get()->eval(); }
     };
@@ -60,6 +65,7 @@ class Function : public std::enable_shared_from_this<Function> {
     virtual Symbol diff(Symbol v) const final;
     virtual void simplified() const = 0;
     virtual double eval() const = 0;
+    virtual Symbol subs(const std::map<Symbol, Symbol> &m) const = 0;
 
     template <class T>
     bool is() const {
@@ -67,7 +73,7 @@ class Function : public std::enable_shared_from_this<Function> {
     }
 
     template <class T>
-    std::shared_ptr<T> ptr() {
+    std::shared_ptr<T> ptr() const {
         return FactoryBase::ptr<T>(id());
     }
 
@@ -109,6 +115,8 @@ class Constant : public Function {
     Constant(double value_) : Function(_repr(std::to_string(value_)), {}), _value(value_) {}
     virtual void simplified() const override {}
     virtual double eval() const override { return _value; }
+    virtual Symbol subs(const std::map<Symbol, Symbol> &m) const override { return Symbol(ptr<Function>()); }
+
 
  protected:
     virtual Symbol _diff(Symbol v) const override { return make_symbol<Constant>(0); }
@@ -153,6 +161,14 @@ class Variable : public Function {
     Variable(const std::string &symbol) : Function(_repr(symbol), {}) {}
     virtual void simplified() const override {}
     virtual double eval() const override { return _value; }
+    virtual Symbol subs(const std::map<Symbol, Symbol> &m) const override {
+        Symbol self(ptr<Variable>());
+        auto iter = m.find(self);
+        if (iter != m.end()) {
+            return iter->second;
+        }
+        return self;
+    }
     void assign(double v) { _value = v; }
 
  protected:

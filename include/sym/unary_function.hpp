@@ -30,6 +30,7 @@ class NegFunction : public UnaryFunction {
     NegFunction(const Symbol &arg_) : UnaryFunction("-", arg_) {}
     virtual void simplified() const override;
     virtual double eval() const override { return -arg->eval(); }
+    virtual Symbol subs(const std::map<Symbol, Symbol> &m) const override { return make_symbol<NegFunction>(arg->subs(m)); }
  protected:
     virtual Symbol _diff(Symbol v) const override {
         return make_symbol<NegFunction>(arg->diff(v));
@@ -49,6 +50,7 @@ class SinFunction : public UnaryFunction {
         }
     }
     virtual double eval() const override { return std::sin(arg->eval()); }
+    virtual Symbol subs(const std::map<Symbol, Symbol> &m) const override { return make_symbol<SinFunction>(arg->subs(m)); }
  protected:
     virtual Symbol _diff(Symbol v) const override;
 };
@@ -64,6 +66,7 @@ class CosFunction : public UnaryFunction {
         }
     }
     virtual double eval() const override { return std::cos(arg->eval()); }
+    virtual Symbol subs(const std::map<Symbol, Symbol> &m) const override { return make_symbol<CosFunction>(arg->subs(m)); }
  protected:
     virtual Symbol _diff(Symbol v) const override;
 };
@@ -79,6 +82,7 @@ class SquareRootFunction : public UnaryFunction {
         }
     }
     virtual double eval() const override { return std::sqrt(arg->eval()); }
+    virtual Symbol subs(const std::map<Symbol, Symbol> &m) const override { return make_symbol<SquareRootFunction>(arg->subs(m)); }
  protected:
     virtual Symbol _diff(Symbol v) const override;
 };
@@ -94,6 +98,7 @@ class ExpFunction : public UnaryFunction {
         }
     }
     virtual double eval() const override { return std::exp(arg->eval()); }
+    virtual Symbol subs(const std::map<Symbol, Symbol> &m) const override { return make_symbol<ExpFunction>(arg->subs(m)); }
  protected:
     virtual Symbol _diff(Symbol v) const override;
 };
@@ -109,6 +114,7 @@ class LogFunction : public UnaryFunction {
         }
     }
     virtual double eval() const override { return std::log(arg->eval()); }
+    virtual Symbol subs(const std::map<Symbol, Symbol> &m) const override { return make_symbol<LogFunction>(arg->subs(m)); }
  protected:
     virtual Symbol _diff(Symbol v) const override;
 };
@@ -124,6 +130,7 @@ class ArcSinFunction : public UnaryFunction {
         }
     }
     virtual double eval() const override { return std::asin(arg->eval()); }
+    virtual Symbol subs(const std::map<Symbol, Symbol> &m) const override { return make_symbol<ArcSinFunction>(arg->subs(m)); }
  protected:
     virtual Symbol _diff(Symbol v) const override;
 };
@@ -139,6 +146,7 @@ class ArcCosFunction : public UnaryFunction {
         }
     }
     virtual double eval() const override { return std::acos(arg->eval()); }
+    virtual Symbol subs(const std::map<Symbol, Symbol> &m) const override { return make_symbol<ArcCosFunction>(arg->subs(m)); }
  protected:
     virtual Symbol _diff(Symbol v) const override;
 };

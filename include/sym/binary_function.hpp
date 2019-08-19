@@ -31,6 +31,7 @@ class AddFunction : public BinaryFunction {
     AddFunction(const Symbol &arg0, const Symbol &arg1) : BinaryFunction("+", arg0, arg1) {}
     virtual void simplified() const override;
     virtual double eval() const override { return arg0->eval() + arg1->eval(); }
+    virtual Symbol subs(const std::map<Symbol, Symbol> &m) const override { return make_symbol<AddFunction>(arg0->subs(m), arg1->subs(m)); }
 
  protected:
     virtual Symbol _diff(Symbol v) const override {
@@ -45,6 +46,7 @@ class SubFunction : public BinaryFunction {
     SubFunction(const Symbol &arg0, const Symbol &arg1) : BinaryFunction("-", arg0, arg1) {}
     virtual void simplified() const override;
     virtual double eval() const override { return arg0->eval() - arg1->eval(); }
+    virtual Symbol subs(const std::map<Symbol, Symbol> &m) const override { return make_symbol<SubFunction>(arg0->subs(m), arg1->subs(m)); }
 
  protected:
     virtual Symbol _diff(Symbol v) const override {
@@ -60,6 +62,7 @@ class MulFunction : public BinaryFunction {
     MulFunction(const Symbol &arg0, const Symbol &arg1) : BinaryFunction("*", arg0, arg1) {}
     virtual void simplified() const override;
     virtual double eval() const override { return arg0->eval() * arg1->eval(); }
+    virtual Symbol subs(const std::map<Symbol, Symbol> &m) const override { return make_symbol<MulFunction>(arg0->subs(m), arg1->subs(m)); }
 
  protected:
     virtual Symbol _diff(Symbol v) const override {
@@ -75,6 +78,7 @@ class DivFunction : public BinaryFunction {
 
     virtual void simplified() const override;
     virtual double eval() const override { return 1 / arg1->eval(); }
+    virtual Symbol subs(const std::map<Symbol, Symbol> &m) const override { return make_symbol<DivFunction>(arg1->subs(m)); }
 
  protected:
     virtual Symbol _diff(Symbol v) const override {
@@ -101,6 +105,7 @@ class Atan2Function : public BinaryFunction {
         }
     }
     virtual double eval() const override { return std::atan2(arg0->eval(), arg1->eval()); }
+    virtual Symbol subs(const std::map<Symbol, Symbol> &m) const override { return make_symbol<Atan2Function>(arg0->subs(m), arg1->subs(m)); }
 
  protected:
     virtual Symbol _diff(Symbol v) const override {
